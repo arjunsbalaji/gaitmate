@@ -27,8 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        onTap: _,
-        currentIndex: _index,
+        onTap: (int index) {
+          print(index);
+          return index;
+        },
+        currentIndex: 0,
         items: [
           BottomNavigationBarItem(
             icon: Icon(
