@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: (int index) {
-          print(index);
+          //print(index);
           return index;
         },
         currentIndex: 0,
