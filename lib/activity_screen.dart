@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import './nav_bar.dart';
 
 class ActivityScreen extends StatelessWidget {
+  static const routeName = '/activity';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

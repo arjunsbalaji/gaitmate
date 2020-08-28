@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import './activity_screen.dart';
+import './tabs_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,7 +15,10 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Color(0xFFF3F5F7),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomeScreen(),
+      home: TabScreen(),
+      routes: {
+        ActivityScreen.routeName: (ctx) => ActivityScreen(),
+      },
     );
   }
 }
