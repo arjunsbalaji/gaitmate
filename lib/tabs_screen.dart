@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import './account_screen.dart';
 import './activity_screen.dart';
 import './dashboard_screen.dart';
-import 'nav_bar.dart';
+import 'widgets/nav_bar.dart';
 
 class TabScreen extends StatefulWidget {
   @override
