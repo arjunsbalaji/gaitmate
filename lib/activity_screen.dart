@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './widgets/activity_selector.dart';
 import './widgets/collection_listview.dart';
 import './models/collection_model.dart';
 
@@ -12,6 +13,7 @@ class ActivityScreen extends StatelessWidget {
           padding: EdgeInsets.all(15.0),
           child: Column(
             children: [
+              ActivitySelector(),
               CollectionListView(collections[0]),
               CollectionListView(collections[1]),
             ],

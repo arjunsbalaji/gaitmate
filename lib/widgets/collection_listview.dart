@@ -43,7 +43,7 @@ class CollectionListView extends StatelessWidget {
           //color: Colors.blue,
           height: 275.0,
           child: ListView.builder(
-            scrollDirection: Axis.horizontal,
+            scrollDirection: Axis.vertical,
             itemBuilder: (context, int index) {
               return Container(
                 width: 210.0,

@@ -37,7 +37,7 @@ class _TabScreenState extends State<TabScreen> {
 
   void _selectPage(int index) {
     setState(() {
-      print(index);
+      //print(index);
       _selectedPage = index;
     });
   }
