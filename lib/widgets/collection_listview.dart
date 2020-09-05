@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gaitmate/models/collection_model.dart';
+import '../models/collection_model.dart';
+import 'package:intl/intl.dart';
 
 class CollectionListView extends StatelessWidget {
   final Collection collection;
+  final DateFormat formatter = DateFormat('dd-MM-yyyy');
 
   CollectionListView(this.collection);
 
@@ -12,63 +14,50 @@ class CollectionListView extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(
-              top: 10, left: 10.0, right: 10.0, bottom: 10.0),
+              top: 30, left: 10.0, right: 10.0, bottom: 10.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                collection.title,
-                style: TextStyle(
-                  fontSize: 30.0,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
-                ),
-              ),
-              GestureDetector(
-                onTap: () => print('See All'), //implement
+              Expanded(
                 child: Text(
-                  'See All',
+                  collection.title,
                   style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
         Container(
           //color: Colors.blue,
-          height: 275.0,
+          height: (MediaQuery.of(context).size.height) * 0.8,
           child: ListView.builder(
             scrollDirection: Axis.vertical,
             itemBuilder: (context, int index) {
               return Container(
-                width: 210.0,
                 //color: Colors.red,
                 margin: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: <Widget>[
-                    Container(
-                      width: 210.0,
-                      height: 130.0,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                                blurRadius: 6.0,
-                                color: Colors.black26,
-                                offset: Offset(0, 2))
-                          ],
-                          borderRadius: BorderRadius.circular(15.0)),
-                      child: Container(
+                child: Container(
+                  height: 100.0,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                            blurRadius: 6.0,
+                            color: Colors.black26,
+                            offset: Offset(0, 2))
+                      ],
+                      borderRadius: BorderRadius.circular(15.0)),
+                  child: Row(
+                    children: [
+                      Container(
                         margin: EdgeInsets.all(9.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
                               collection.activities[index].id,
@@ -83,41 +72,24 @@ class CollectionListView extends StatelessWidget {
                                   color: Colors.grey,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 1.2,
-                                  fontSize: 22.0),
+                                  fontSize: 14.0),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    Positioned(
-                      top: 15,
-                      child: Container(
-                        height: 150,
-                        width: 175,
-                        decoration: BoxDecoration(
-                          color: Colors.amber,
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 6.0,
-                              color: Colors.black26,
-                              offset: Offset(0, 2),
-                            )
-                          ],
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
+                      Container(
                         child: Column(
                           children: [
-                            Text(collection.activities[index].endTime
-                                .toString()),
-                            Text(collection.activities[index].startTime
-                                .toString()),
-                            Text(collection.activities[index].notes),
+                            Text(formatter
+                                .format(collection.activities[index].endTime)),
+                            Text(formatter.format(
+                                collection.activities[index].startTime)),
                             Text(collection.activities[index].value.toString()),
                           ],
                         ),
                       ),
-                    )
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

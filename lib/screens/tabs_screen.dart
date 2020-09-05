@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import './account_screen.dart';
-import './activity_screen.dart';
 import './dashboard_screen.dart';
-import 'widgets/nav_bar.dart';
+import './add_activity_screen.dart';
 
 class TabScreen extends StatefulWidget {
   @override
@@ -23,7 +22,7 @@ class _TabScreenState extends State<TabScreen> {
         'title': 'Dashboard',
       },
       {
-        'page': ActivityScreen(),
+        'page': AddActivityScreen(),
         'title': 'Activity',
       },
       {
@@ -58,13 +57,13 @@ class _TabScreenState extends State<TabScreen> {
           BottomNavigationBarItem(
             title: SizedBox.shrink(),
             icon: Icon(
-              Icons.search,
+              Icons.dashboard,
             ),
           ),
           BottomNavigationBarItem(
             title: SizedBox.shrink(),
             icon: Icon(
-              Icons.dashboard,
+              Icons.add,
             ),
           ),
           BottomNavigationBarItem(

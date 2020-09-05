@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import './activity_screen.dart';
-import './tabs_screen.dart';
+import 'package:gaitmate/models/collection_model.dart';
+import 'package:gaitmate/screens/dashboard_screen.dart';
+import 'screens/tabs_screen.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  Collection _collection = collections[0];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,7 +20,7 @@ class MyApp extends StatelessWidget {
       ),
       home: TabScreen(),
       routes: {
-        ActivityScreen.routeName: (ctx) => ActivityScreen(),
+        DashboardScreen.routeName: (ctx) => DashboardScreen(),
       },
     );
   }
