@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/collection_model.dart';
-import '../screens/activity_screen.dart';
+import '../screens/activities_screen.dart';
 
 class CollectionsPreview extends StatelessWidget {
   final Collection collection;
@@ -21,7 +21,7 @@ class CollectionsPreview extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ActivityScreen(
+              builder: (context) => ActivitiesScreen(
                 collection,
               ),
             ),

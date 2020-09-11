@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
-import '../widgets/collection_listview.dart';
-import '../models/collection_model.dart';
+import '../models/activity_model.dart';
 
 class ActivityScreen extends StatelessWidget {
-  static const routeName = '/activity';
+  final Activity activity;
 
-  final Collection collection;
-
-  ActivityScreen(this.collection);
+  ActivityScreen(this.activity);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        height: MediaQuery.of(context).size.height,
-        padding: EdgeInsets.all(15.0),
-        child: CollectionListView(collection),
+        padding: EdgeInsets.all(20),
+        child: Text(activity.id),
       ),
     );
   }
