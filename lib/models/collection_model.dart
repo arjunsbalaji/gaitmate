@@ -44,6 +44,24 @@ List<Activity> activities = [
       endTime: DateTime.utc(2020, 6, 4, 10, 10),
       value: 0,
       notes: 'Description for activity.'),
+  Activity(
+      id: 'sixth',
+      startTime: DateTime.utc(2020, 6, 4, 8, 10),
+      endTime: DateTime.utc(2020, 6, 4, 10, 10),
+      value: 0,
+      notes: 'Description for activity.'),
+  Activity(
+      id: 'seventh',
+      startTime: DateTime.utc(2020, 6, 4, 8, 10),
+      endTime: DateTime.utc(2020, 6, 4, 10, 10),
+      value: 0,
+      notes: 'Description for activity.'),
+  Activity(
+      id: 'ninth',
+      startTime: DateTime.utc(2020, 6, 4, 8, 10),
+      endTime: DateTime.utc(2020, 6, 4, 10, 10),
+      value: 0,
+      notes: 'Description for activity.'),
 ];
 
 List<Collection> collections = [
