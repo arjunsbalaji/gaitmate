@@ -10,6 +10,7 @@ class Collection with ChangeNotifier {
     Activity(
         id: 'first',
         startTime: DateTime.utc(2020, 6, 4, 8, 10),
+        duration: Duration(seconds: 20),
         type: 'run',
         endTime: DateTime.utc(2020, 6, 4, 10, 10),
         data: {'gyro': 1, 'lin': 0, 'value': 100},
@@ -17,6 +18,7 @@ class Collection with ChangeNotifier {
     Activity(
         id: 'second',
         startTime: DateTime.utc(2020, 6, 4, 8, 10),
+        duration: Duration(seconds: 20),
         type: 'run',
         endTime: DateTime.utc(2020, 6, 4, 10, 10),
         data: {'gyro': 1, 'lin': 0, 'value': 100},
@@ -24,6 +26,7 @@ class Collection with ChangeNotifier {
     Activity(
         id: 'third',
         startTime: DateTime.utc(2020, 6, 4, 8, 10),
+        duration: Duration(seconds: 20),
         endTime: DateTime.utc(2020, 6, 4, 10, 10),
         data: {'gyro': 1, 'lin': 0, 'value': 100},
         type: 'run',
@@ -31,6 +34,7 @@ class Collection with ChangeNotifier {
     Activity(
         id: 'fourth',
         startTime: DateTime.utc(2020, 6, 4, 8, 10),
+        duration: Duration(seconds: 20),
         type: 'run',
         endTime: DateTime.utc(2020, 6, 4, 10, 10),
         data: {'gyro': 1, 'lin': 0, 'value': 100},
@@ -38,6 +42,7 @@ class Collection with ChangeNotifier {
     Activity(
         id: 'fifth',
         startTime: DateTime.utc(2020, 6, 4, 8, 10),
+        duration: Duration(seconds: 20),
         type: 'run',
         endTime: DateTime.utc(2020, 6, 4, 10, 10),
         data: {'gyro': 1, 'lin': 0, 'value': 100},
@@ -45,6 +50,7 @@ class Collection with ChangeNotifier {
     Activity(
         id: 'sixth',
         startTime: DateTime.utc(2020, 6, 4, 8, 10),
+        duration: Duration(seconds: 20),
         type: 'walk',
         endTime: DateTime.utc(2020, 6, 4, 10, 10),
         data: {'gyro': 1, 'lin': 0, 'value': 100},
@@ -52,6 +58,7 @@ class Collection with ChangeNotifier {
     Activity(
         id: 'seventh',
         startTime: DateTime.utc(2020, 6, 4, 8, 10),
+        duration: Duration(seconds: 20),
         type: 'walk',
         endTime: DateTime.utc(2020, 6, 4, 10, 10),
         data: {'gyro': 1, 'lin': 0, 'value': 100},
@@ -59,6 +66,7 @@ class Collection with ChangeNotifier {
     Activity(
         id: 'ninth',
         startTime: DateTime.utc(2020, 6, 4, 8, 10),
+        duration: Duration(seconds: 20),
         type: 'walk',
         endTime: DateTime.utc(2020, 6, 4, 10, 10),
         data: {'gyro': 1, 'lin': 0, 'value': 100},
@@ -78,13 +86,20 @@ class Collection with ChangeNotifier {
     return _activities.where((act) => (act.type == type)).toList();
   }
 
-  void addActivity(String id, String notes, String type,
-      Map<String, Object> data, DateTime startTime, DateTime endTime) {
+  void addActivity(
+      String id,
+      String notes,
+      String type,
+      Map<String, Object> data,
+      DateTime startTime,
+      Duration duration,
+      DateTime endTime) {
     _activities.add(
       Activity(
         id: id,
         data: data,
         type: type,
+        duration: duration,
         notes: notes,
         startTime: startTime,
         endTime: endTime,
@@ -92,4 +107,6 @@ class Collection with ChangeNotifier {
     );
     notifyListeners();
   }
+
+  void removeActivity(String id) {}
 }

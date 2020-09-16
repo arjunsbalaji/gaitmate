@@ -6,6 +6,7 @@ class Activity with ChangeNotifier {
   final String type;
   final Map<String, Object> data;
   final DateTime startTime;
+  final Duration duration;
   final DateTime endTime;
 
   Activity({
@@ -14,6 +15,7 @@ class Activity with ChangeNotifier {
     @required this.notes,
     @required this.type,
     @required this.startTime,
+    @required this.duration,
     @required this.endTime,
   });
 }

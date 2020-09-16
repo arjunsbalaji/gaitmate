@@ -104,6 +104,7 @@ class CollectionListView extends StatelessWidget {
                                 children: [
                                   Text(formatter
                                       .format(activities[index].startTime)),
+                                  Text(activities[index].duration.toString())
                                 ],
                               ),
                             ),
