@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/activity_model.dart';
+import '../providers/activity.dart';
 
 class ActivityScreen extends StatelessWidget {
   final Activity activity;

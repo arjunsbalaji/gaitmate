@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import '../models/collection_model.dart';
+import '../providers/activity.dart';
 import 'package:intl/intl.dart';
 import '../screens/activity_screen.dart';
 
 class CollectionListView extends StatelessWidget {
-  final Collection collection;
+  //final Collection collection;
+  final String title;
+  //pass description through here
+  final List<Activity> activities;
   final DateFormat formatter = DateFormat('dd-MM-yyyy');
 
-  CollectionListView(this.collection);
+  CollectionListView(this.title, this.activities);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +24,7 @@ class CollectionListView extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  collection.title,
+                  title,
                   style: TextStyle(
                     fontSize: 32.0,
                     fontWeight: FontWeight.bold,
@@ -41,12 +44,12 @@ class CollectionListView extends StatelessWidget {
               itemBuilder: (context, int index) {
                 return GestureDetector(
                   onTap: () {
-                    print(collection.activities[index].id);
+                    print(activities[index].id);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ActivityScreen(
-                          collection.activities[index],
+                          activities[index],
                         ),
                       ),
                     );
@@ -75,14 +78,14 @@ class CollectionListView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  collection.activities[index].id,
+                                  activities[index].id,
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 1.2,
                                       fontSize: 22.0),
                                 ),
                                 Text(
-                                  collection.activities[index].notes,
+                                  activities[index].notes,
                                   style: TextStyle(
                                       color: Colors.grey,
                                       fontWeight: FontWeight.w600,
@@ -99,10 +102,8 @@ class CollectionListView extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 //crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(formatter.format(
-                                      collection.activities[index].startTime)),
-                                  Text(collection.activities[index].value
-                                      .toString()),
+                                  Text(formatter
+                                      .format(activities[index].startTime)),
                                 ],
                               ),
                             ),
@@ -113,7 +114,7 @@ class CollectionListView extends StatelessWidget {
                   ),
                 );
               },
-              itemCount: collection.activities.length,
+              itemCount: activities.length,
             ),
           ),
         )

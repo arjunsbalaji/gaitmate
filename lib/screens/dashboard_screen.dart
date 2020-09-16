@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../widgets/collections_preview.dart';
-import '../models/collection_model.dart';
+import '../providers/collection.dart';
 
 class DashboardScreen extends StatelessWidget {
   static const routeName = '/dashboard';
   @override
   Widget build(BuildContext context) {
+    final Collection collection = Provider.of<Collection>(context);
+
     return Scaffold(
       body: Container(
         padding: EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 10),
@@ -32,8 +35,10 @@ class DashboardScreen extends StatelessWidget {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) =>
-                      CollectionsPreview(collections[index]),
-                  itemCount: collections.length,
+                      CollectionsPreview(collection.types[index]),
+                  //itemBuilder: (context, index) =>
+                  //    CollectionsPreview(collection[index]),
+                  itemCount: collection.types.length,
                 ),
               ),
             ),

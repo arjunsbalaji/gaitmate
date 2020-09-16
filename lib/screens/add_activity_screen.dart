@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/add_activity_form.dart';
 
 class AddActivityScreen extends StatefulWidget {
   @override
@@ -8,8 +9,6 @@ class AddActivityScreen extends StatefulWidget {
 class _AddActivityScreenState extends State<AddActivityScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text('ADD ACTIVITY'),
-    );
+    return AddActvityForm();
   }
 }

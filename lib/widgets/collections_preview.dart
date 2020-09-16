@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import '../models/collection_model.dart';
+import 'package:gaitmate/providers/activity.dart';
+import '../providers/collection.dart';
 import '../screens/activities_screen.dart';
+import 'package:provider/provider.dart';
 
 class CollectionsPreview extends StatelessWidget {
-  final Collection collection;
+  //final Collection collection;
+  final String title;
 
-  CollectionsPreview(this.collection);
+  CollectionsPreview(this.title);
 
   @override
   Widget build(BuildContext context) {
@@ -17,12 +20,12 @@ class CollectionsPreview extends StatelessWidget {
       padding: EdgeInsets.all(10),
       child: GestureDetector(
         onTap: () {
-          print(collection.title);
+          print(title);
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ActivitiesScreen(
-                collection,
+                title,
               ),
             ),
           );
@@ -41,7 +44,7 @@ class CollectionsPreview extends StatelessWidget {
             borderRadius: BorderRadius.circular(30.0),
           ),
           child: Text(
-            collection.title,
+            title,
             style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.w700,
