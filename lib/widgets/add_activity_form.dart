@@ -155,7 +155,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
                       DateTime endTime = DateTime.now().add(
                         new Duration(seconds: 30),
                       );
-                      collection.addActivity(
+/*                       collection.addActivity(
                           id,
                           notesController.text,
                           dropType,
@@ -166,7 +166,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
                           },
                           startTime,
                           duration,
-                          endTime);
+                          endTime); */
                       //print('submit');
                     }
                   }),
