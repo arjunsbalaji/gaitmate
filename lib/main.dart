@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gaitmate/providers/collection.dart';
+import 'package:gaitmate/providers/stopwatch.dart';
 import 'package:gaitmate/screens/dashboard_screen.dart';
 import 'package:provider/provider.dart';
 import 'screens/tabs_screen.dart';
@@ -16,6 +17,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => Collection('DEMO TITLE (USER)', 'DEMO DESCRIPTION'),
         ),
+        ChangeNotifierProvider(
+          create: (_) => MyStopwatch(),
+        )
       ],
       child: MaterialApp(
         title: 'Gait Mate',

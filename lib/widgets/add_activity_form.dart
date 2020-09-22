@@ -2,10 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gaitmate/providers/collection.dart';
+import 'package:gaitmate/providers/stopwatch.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
-import '../streams/stopwatch.dart';
+import '../providers/stopwatch.dart';
 
 class AddActvityForm extends StatefulWidget {
   @override
@@ -18,11 +19,10 @@ class _AddActvityFormState extends State<AddActvityForm> {
   final DateFormat formatter = DateFormat('dd-MM-yyyy');
   final notesController = TextEditingController();
   Random random = new Random(); //this is just here for now
-  Stopwatch stopwatch = new Stopwatch();
+  //Stopwatch stopwatch = new Stopwatch();
   bool recording = false;
+  bool submittable = false;
 
-  Stream<int> timerStream;
-  StreamSubscription<int> timerSubscription;
   String hoursStr = '00';
   String minutesStr = '00';
   String secondsStr = '00';
@@ -33,9 +33,20 @@ class _AddActvityFormState extends State<AddActvityForm> {
     });
   }
 
+  void _reset(MyStopwatch swatch) {
+    if (_formKey.currentState.validate()) {
+      //IMPLEMENT ADD COLLECTION FUNCTIONALITY. IF I AM
+      //RECORDING AND GO OFF THE PAGE TIMER ISNT CANCELLED
+      //SO NEED TO PUT THAT IN
+      swatch.reset();
+      print(hoursStr + minutesStr + secondsStr);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Collection collection = Provider.of<Collection>(context);
+    MyStopwatch swatch = Provider.of<MyStopwatch>(context);
     return Form(
       key: _formKey,
       child: Container(
@@ -98,7 +109,8 @@ class _AddActvityFormState extends State<AddActvityForm> {
             ),
             Container(
               child: Text(
-                "$hoursStr:$minutesStr:$secondsStr",
+                //"$hoursStr:$minutesStr:$secondsStr",
+                swatch.totalDuration,
                 style: TextStyle(
                   fontSize: 90.0,
                 ),
@@ -109,68 +121,43 @@ class _AddActvityFormState extends State<AddActvityForm> {
               height: 80,
               width: 80,
               child: RaisedButton(
-                  color: recording
-                      ? Colors.redAccent
-                      : Theme.of(context).primaryColor,
-                  elevation: 10.0,
-                  child: Container(
-                    //color: Colors.blue,
-                    width: 40,
-                    height: 40,
-                    child: Column(
-                      children: [
-                        recording ? Icon(Icons.stop) : Icon(Icons.play_arrow),
-                        recording ? Text('Stop') : Text('Start'),
-                      ],
-                    ),
+                color: recording
+                    ? Colors.redAccent
+                    : Theme.of(context).primaryColor,
+                elevation: 10.0,
+                child: Container(
+                  //color: Colors.blue,
+                  width: 40,
+                  height: 40,
+                  child: Column(
+                    children: [
+                      recording ? Icon(Icons.stop) : Icon(Icons.play_arrow),
+                      recording ? Text('Stop') : Text('Start'),
+                    ],
                   ),
-                  shape: CircleBorder(
-                    side: BorderSide(
-                        //color: Theme.of(context).primaryColor,
-                        ),
-                  ),
-                  onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      _recordChange();
-                      var timerStream = stopWatchStream();
-                      var timerSubscription = timerStream.listen((int newTick) {
-                        setState(() {
-                          hoursStr = ((newTick / (60 * 60)) % 60)
-                              .floor()
-                              .toString()
-                              .padLeft(2, '0');
-                          minutesStr = ((newTick / 60) % 60)
-                              .floor()
-                              .toString()
-                              .padLeft(2, '0');
-                          secondsStr =
-                              (newTick % 60).floor().toString().padLeft(2, '0');
-                        });
-                      });
-                      print(recording.toString());
-                      String id =
-                          DateTime.now().millisecondsSinceEpoch.toString();
-                      DateTime startTime = DateTime.now();
-                      Duration duration = stopwatch.elapsed;
-                      DateTime endTime = DateTime.now().add(
-                        new Duration(seconds: 30),
-                      );
-/*                       collection.addActivity(
-                          id,
-                          notesController.text,
-                          dropType,
-                          {
-                            'gyro': random.nextInt(10),
-                            'lin': random.nextInt(10),
-                            'value': random.nextInt(10)
-                          },
-                          startTime,
-                          duration,
-                          endTime); */
-                      //print('submit');
-                    }
-                  }),
+                ),
+                shape: CircleBorder(
+                  side: BorderSide(
+                      //color: Theme.of(context).primaryColor,
+                      ),
+                ),
+                onPressed: () {
+                  _recordChange();
+                  recording ? swatch.start() : swatch.pause();
+                  submittable = true;
+                  print(recording);
+                },
+              ),
             ),
+            (submittable && !recording)
+                ? RaisedButton(
+                    child: Text('reset'),
+                    onPressed: () => _reset(swatch),
+                  )
+                : SizedBox(
+                    height: 10,
+                    width: 10,
+                  ),
           ],
         ),
       ),
