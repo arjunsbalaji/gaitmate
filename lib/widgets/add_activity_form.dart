@@ -33,11 +33,27 @@ class _AddActvityFormState extends State<AddActvityForm> {
     });
   }
 
-  void _reset(MyStopwatch swatch) {
+  void _reset(MyStopwatch swatch, Collection collection) {
     if (_formKey.currentState.validate()) {
       //IMPLEMENT ADD COLLECTION FUNCTIONALITY. IF I AM
       //RECORDING AND GO OFF THE PAGE TIMER ISNT CANCELLED
       //SO NEED TO PUT THAT IN
+      String id = DateTime.now().millisecondsSinceEpoch.toString();
+      String notes = notesController.text;
+      Duration elapsedTime = Duration(seconds: swatch.counter);
+      DateTime startTime = DateTime.now();
+      collection.addActivity(
+        id,
+        notes,
+        dropType,
+        {
+          'gyro': 10,
+          'accel': [1, 2, 3],
+        },
+        startTime,
+        elapsedTime,
+        startTime.add(elapsedTime),
+      );
       swatch.reset();
       print(hoursStr + minutesStr + secondsStr);
     }
@@ -109,7 +125,6 @@ class _AddActvityFormState extends State<AddActvityForm> {
             ),
             Container(
               child: Text(
-                //"$hoursStr:$minutesStr:$secondsStr",
                 swatch.totalDuration,
                 style: TextStyle(
                   fontSize: 90.0,
@@ -151,8 +166,8 @@ class _AddActvityFormState extends State<AddActvityForm> {
             ),
             (submittable && !recording)
                 ? RaisedButton(
-                    child: Text('reset'),
-                    onPressed: () => _reset(swatch),
+                    child: Text('Submit'),
+                    onPressed: () => _reset(swatch, collection),
                   )
                 : SizedBox(
                     height: 10,
