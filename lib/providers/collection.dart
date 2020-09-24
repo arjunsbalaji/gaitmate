@@ -1,5 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'activity.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 
 class Collection with ChangeNotifier {
   final String title;
@@ -86,26 +91,38 @@ class Collection with ChangeNotifier {
     return _activities.where((act) => (act.type == type)).toList();
   }
 
-  void addActivity(
-      String id,
-      String notes,
-      String type,
-      Map<String, Object> data,
-      DateTime startTime,
-      Duration duration,
-      DateTime endTime) {
-    _activities.add(
-      Activity(
-        id: id,
+  Future<void> addActivity(String notes, String type, Map<String, Object> data,
+      DateTime startTime, Duration duration, DateTime endTime) async {
+    const url = 'https://gaitmate.firebaseio.com/activities.json';
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'notes': notes,
+            'type': type,
+            'data': data,
+            'startTime': startTime.toString(),
+            'duration': duration.toString(),
+            'endTime': endTime.toString(),
+          },
+        ),
+      );
+      final newActivity = Activity(
+        id: json.decode(response.body)['name'],
         data: data,
         type: type,
         duration: duration,
         notes: notes,
         startTime: startTime,
         endTime: endTime,
-      ),
-    );
-    notifyListeners();
+      );
+      _activities.add(newActivity);
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      throw e;
+    }
   }
 
   void removeActivity(String id) {}
