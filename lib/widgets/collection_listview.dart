@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gaitmate/providers/collection.dart';
+import 'package:provider/provider.dart';
 import '../providers/activity.dart';
 import 'package:intl/intl.dart';
 import '../screens/activity_screen.dart';
@@ -8,10 +10,9 @@ class CollectionListView extends StatelessWidget {
   final String title;
   //pass description through here
   final List<Activity> activities;
-  final DateFormat formatter = DateFormat('dd-MM-yyyy');
-
   CollectionListView(this.title, this.activities);
 
+  final DateFormat formatter = DateFormat('dd-MM-yyyy');
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -78,14 +79,14 @@ class CollectionListView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  activities[index].id,
+                                  activities[index].notes,
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 1.2,
                                       fontSize: 22.0),
                                 ),
                                 Text(
-                                  activities[index].notes,
+                                  activities[index].id,
                                   style: TextStyle(
                                       color: Colors.grey,
                                       fontWeight: FontWeight.w600,

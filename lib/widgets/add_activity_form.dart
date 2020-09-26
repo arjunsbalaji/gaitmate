@@ -35,7 +35,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
     });
   }
 
-  void _submit(MyStopwatch swatch, Collection collection) {
+  Future<void> _submit(MyStopwatch swatch, Collection collection) async {
     if (_formKey.currentState.validate()) {
       //IF I AM
       //RECORDING AND GO OFF THE PAGE TIMER ISNT CANCELLED
@@ -47,38 +47,42 @@ class _AddActvityFormState extends State<AddActvityForm> {
       String notes = notesController.text;
       Duration elapsedTime = Duration(seconds: swatch.counter);
       DateTime startTime = DateTime.now();
-      collection
-          .addActivity(
-        notes,
-        dropType,
-        {
-          'gyro': 10,
-          'accel': [1, 2, 3],
-        },
-        startTime,
-        elapsedTime,
-        startTime.add(elapsedTime),
-      )
-          .then(
-        (_) {
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: Text(dropType + ' Added!'),
-              content: Text('Success!'),
-              //can put actions here
-            ),
-          );
-        },
-      );
+      try {
+        await collection.addActivity(
+            notes,
+            dropType,
+            {
+              'gyro': 10,
+              'accel': [1, 2, 3],
+            },
+            startTime,
+            elapsedTime,
+            startTime.add(elapsedTime));
+      } catch (error) {
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(dropType + ' Added!'),
+            content: Text('Success!'),
+            //can put actions here
+          ),
+        );
+      }
       swatch.reset();
       setState(
         () {
           isLoading = false;
         },
       );
+
       print(hoursStr + minutesStr + secondsStr);
     }
+  }
+
+  @override
+  void dispose() {
+    
+    super.dispose();
   }
 
   @override
