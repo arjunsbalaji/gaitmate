@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -173,5 +174,18 @@ class Collection with ChangeNotifier {
     }
   }
 
-  void removeActivity(String id) {}
+  Future<void> removeActivity(String id) async {
+    final url = "https://gaitmate.firebaseio.com/activities/$id.json";
+    final extActIndex = _activities.indexWhere((act) => act.id == id);
+    var existingAct = _activities[extActIndex];
+    _activities.removeAt(extActIndex);
+    notifyListeners();
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      _activities.insert(extActIndex, existingAct);
+      notifyListeners();
+      throw HttpException('Could not delete this activity.');
+    }
+    existingAct = null;
+  }
 }

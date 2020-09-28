@@ -19,7 +19,7 @@ class ActivitiesScreen extends StatefulWidget {
 class _ActivitiesScreenState extends State<ActivitiesScreen> {
   bool _isInit = true;
 
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   @override
   void didChangeDependencies() {
@@ -27,10 +27,13 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
       setState(() {
         _isLoading = true;
       });
-      Provider.of<Collection>(context).initSetActivities();
-      setState(() {
-        _isLoading = false;
-      });
+      Provider.of<Collection>(context).initSetActivities().then(
+            (_) => setState(
+              () {
+                _isLoading = false;
+              },
+            ),
+          );
     }
     _isInit = false;
     super.didChangeDependencies();
@@ -44,13 +47,9 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         Provider.of<Collection>(context).getActvitiesByType(type);
     return Scaffold(
       body: Container(
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Container(
-                height: MediaQuery.of(context).size.height,
-                padding: EdgeInsets.all(15.0),
-                child: CollectionListView(widget.title, activities),
-              ),
+        height: MediaQuery.of(context).size.height,
+        padding: EdgeInsets.all(15.0),
+        child: CollectionListView(widget.title, activities),
       ),
     );
   }
