@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gaitmate/screens/tabs_screen.dart';
+import '../providers/auth.dart';
+import 'package:provider/provider.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -78,8 +81,151 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        content: Text(message),
+        title: Text('An Error Occurred!'),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Text('Okay'),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _switchAuthMode() {
+    if (_authMode == AuthMode.Login) {
+      setState(
+        () {
+          _authMode = AuthMode.Signup;
+        },
+      );
+    } else {
+      setState(
+        () {
+          _authMode = AuthMode.Login;
+        },
+      );
+    }
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    _formKey.currentState.save();
+    setState(
+      () {
+        _isLoading = true;
+      },
+    );
+    if (_authMode == AuthMode.Login) {
+      await Provider.of<Auth>(context, listen: false).login(
+        _authData['email'],
+        _authData['password'],
+      );
+    } else {
+      await Provider.of<Auth>(context, listen: false).signup(
+        _authData['email'],
+        _authData['password'],
+      );
+    }
+    setState(
+      () {
+        _isLoading = false;
+      },
+    );
+    Navigator.of(context).popAndPushNamed(TabScreen.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    final deviceSize = MediaQuery.of(context).size;
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      elevation: 8.0,
+      child: Container(
+        height:
+            _authMode == AuthMode.Signup ? 320 : 260, // implement reactive here
+        width: deviceSize.width * 0.75,
+        padding: EdgeInsets.all(8.0),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Enter email',
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value.isEmpty || !value.contains('@')) {
+                      return 'Invalid email!';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _authData['email'] = value;
+                  },
+                ),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Enter password',
+                  ),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value.isEmpty || value.length < 5) {
+                      return 'Password too short';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _authData['password'] = value;
+                  },
+                ),
+                if (_authMode == AuthMode.Signup)
+                  TextFormField(
+                    enabled: _authMode == AuthMode.Signup,
+                    decoration: InputDecoration(labelText: 'Confirm Password'),
+                    obscureText: true,
+                    validator: _authMode == AuthMode.Signup
+                        ? (value) {
+                            if (value != _passwordController.text) {
+                              return 'Passwords don\'t match';
+                            }
+                          }
+                        : null,
+                  ),
+                SizedBox(
+                  height: 20,
+                ),
+                _isLoading
+                    ? CircularProgressIndicator()
+                    : RaisedButton(
+                        child: Text(
+                            _authMode == AuthMode.Login ? 'LOGIN' : 'SIGNUP'),
+                        onPressed: _submit,
+                      ),
+                FlatButton(
+                  onPressed: _switchAuthMode,
+                  child: Text(
+                      '${_authMode == AuthMode.Login ? 'SIGNUP' : 'LOGIN'} INSTEAD'),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

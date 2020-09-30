@@ -4,13 +4,12 @@ import './dashboard_screen.dart';
 import './add_activity_screen.dart';
 
 class TabScreen extends StatefulWidget {
+  static const routeName = '/tabscreen';
   @override
   _TabScreenState createState() => _TabScreenState();
 }
 
 class _TabScreenState extends State<TabScreen> {
-  static const routeName = '/';
-
   List<Map<String, Object>> _pages;
   int _selectedPage = 0;
 
