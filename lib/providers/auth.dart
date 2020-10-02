@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import '../model/http_exception.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
   String _token;
@@ -10,7 +13,7 @@ class Auth with ChangeNotifier {
   Timer _authTimer;
 
   bool get isAuth {
-    return _token != null;
+    return token != null;
   }
 
   String get token {
@@ -22,22 +25,89 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  String get userId {
+    return _userId;
+  }
+
+  Future<void> logout() async {
+    //print(_token);
+    _token = null;
+    _userId = null;
+    _expiryDate = null;
+    if (_authTimer != null) {
+      _authTimer.cancel();
+      _authTimer = null;
+    }
+    notifyListeners();
+    print(_token);
+  }
+
+  void _autoLogout() {
+    if (_authTimer != null) {
+      _authTimer.cancel();
+    }
+    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+    _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
+  }
+
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
     const api = 'AIzaSyC-QibshT_E_j3HK-5i4RReDgpIfO5luy0';
     final url =
         'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=$api';
-    final response = await http.post(
-      url,
-      body: json.encode(
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'email': email,
+            'password': password,
+            'returnSecureToken': true,
+          },
+        ),
+      );
+      final responseData = json.decode(response.body);
+      if (responseData['error'] != null) {
+        throw MyHttpException(responseData['error']['message']);
+      }
+      _token = responseData['idToken']; //check firebase docs
+      _userId = responseData['localId'];
+      _expiryDate = DateTime.now().add(
+        Duration(
+          seconds: int.parse(responseData['expiresIn']),
+        ),
+      );
+      _autoLogout();
+      notifyListeners();
+      final prefs = await SharedPreferences.getInstance();
+      final userData = json.encode(
         {
-          'email': email,
-          'password': password,
-          'returnSecureToken': true,
+          'token': _token,
+          'userId': _userId,
+          'expiryDate': _expiryDate.toIso8601String()
         },
-      ),
-    );
-    print(json.decode(response.body));
+      );
+      prefs.setString('userData', userData);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<void> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('userData')) {
+      return false;
+    }
+    final extractedUserData =
+        json.decode(prefs.getString('userData')) as Map<String, Object>;
+    final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
+    if (_expiryDate.isBefore(DateTime.now())) {
+      _expiryDate = expiryDate;
+      _token = extractedUserData['token'];
+      _userId = extractedUserData['userId'];
+      notifyListeners();
+      _autoLogout();
+    }
   }
 
   Future<void> signup(String email, String password) async {

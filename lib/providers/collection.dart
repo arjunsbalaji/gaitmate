@@ -30,7 +30,7 @@ class Collection with ChangeNotifier {
         data: {'gyro': 1, 'lin': 0, 'value': 100},
         notes: 'Description for activity.'),
     Activity(
-        id: 'third',
+        id: 'third', 
         startTime: DateTime.utc(2020, 6, 4, 8, 10),
         duration: Duration(seconds: 20),
         endTime: DateTime.utc(2020, 6, 4, 10, 10),
@@ -80,10 +80,15 @@ class Collection with ChangeNotifier {
   ]; */
 
   List<Activity> _activities = [];
+  final String authToken;
+  final String userId;
 
   Collection(
     this.title,
     this.description,
+    this.authToken,
+    this.userId,
+    this._activities,
   );
 
   List<Activity> get activities {
@@ -111,7 +116,8 @@ class Collection with ChangeNotifier {
   }
 
   Future<void> initSetActivities() async {
-    const url = 'https://gaitmate.firebaseio.com/activities.json';
+    final url =
+        'https://gaitmate.firebaseio.com/$userId/activities.json?auth=$authToken';
     try {
       final response = await http.get(url);
       final extData = json.decode(response.body) as Map<String, dynamic>;
@@ -142,7 +148,8 @@ class Collection with ChangeNotifier {
 
   Future<void> addActivity(String notes, String type, Map<String, Object> data,
       DateTime startTime, Duration duration, DateTime endTime) async {
-    const url = 'https://gaitmate.firebaseio.com/activities.json';
+    final url =
+        'https://gaitmate.firebaseio.com/$userId/activities.json?auth=$authToken';
     try {
       final response = await http.post(
         url,
@@ -175,7 +182,8 @@ class Collection with ChangeNotifier {
   }
 
   Future<void> removeActivity(String id) async {
-    final url = "https://gaitmate.firebaseio.com/activities/$id.json";
+    final url =
+        "https://gaitmate.firebaseio.com/$userId/activities/$id.json?auth=$authToken";
     final extActIndex = _activities.indexWhere((act) => act.id == id);
     var existingAct = _activities[extActIndex];
     _activities.removeAt(extActIndex);
