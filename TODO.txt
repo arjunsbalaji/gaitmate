@@ -1,0 +1,11 @@
+This is a running TODO list for the app. We will try to finish these items. If we need to update ad more or move 
+things around thats easy just do so.   - Arj
+
+
+. Reformat add activity screen
+. Bluetooth connectivity (check pub dev)
+. add live plotting of data streams to be integrated with sensor data streams (pubdev)
+. fix logout bug?? not sure if its an actual bug
+. add theming
+. add location data and map to activity, also display it on activity screen
+. reformat activity screen
