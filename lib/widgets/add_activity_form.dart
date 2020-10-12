@@ -19,16 +19,14 @@ class _AddActvityFormState extends State<AddActvityForm> {
   String dropType = 'run';
   final DateFormat formatter = DateFormat('dd-MM-yyyy');
   final notesController = TextEditingController();
-  Random random = new Random(); //this is just here for now
-  //Stopwatch stopwatch = new Stopwatch();
 
-  Activity newActivity = Activity(
-    id: '',
+  Activity _newActivity = Activity(
+    id: null,
     data: null,
     notes: '',
     type: 'run',
     startTime: DateTime.now(),
-    duration: Duration(seconds: 0),
+    duration: '',
     endTime: DateTime.now().add(
       Duration(seconds: 100),
     ),
@@ -36,11 +34,6 @@ class _AddActvityFormState extends State<AddActvityForm> {
 
   bool recording = false;
   bool submittable = false;
-
-  String hoursStr = '00';
-  String minutesStr = '00';
-  String secondsStr = '00';
-
   bool isLoading = false;
 
   void _recordChange() {
@@ -51,12 +44,28 @@ class _AddActvityFormState extends State<AddActvityForm> {
     );
   }
 
+  Duration strToDuration(String s) {
+    int hours = 0;
+    int minutes = 0;
+    //int seconds = 0;
+    int micros;
+    List<String> parts = s.split(':');
+    if (parts.length > 2) {
+      hours = int.parse(parts[parts.length - 3]);
+    }
+    if (parts.length > 1) {
+      minutes = int.parse(parts[parts.length - 2]);
+    }
+    micros = (double.parse(parts[parts.length - 1]) * 1000000).round();
+    return Duration(hours: hours, minutes: minutes, microseconds: micros);
+  }
+
   void _reset(MyStopwatch swatch) {
     _formKey.currentState.reset();
     swatch.reset();
   }
 
-  Future<void> _submit(MyStopwatch swatch, Collection collection) async {
+  Future<void> _submit(MyStopwatch swatch) async {
     if (_formKey.currentState.validate()) {
       //IF I AM
       //RECORDING AND GO OFF THE PAGE TIMER ISNT CANCELLED
@@ -65,21 +74,13 @@ class _AddActvityFormState extends State<AddActvityForm> {
       setState(() {
         isLoading = true;
       });
-      String notes = notesController.text;
-      Duration elapsedTime = Duration(seconds: swatch.counter);
-      DateTime startTime = DateTime.now();
-
+      _formKey.currentState.save();
+      //String notes = notesController.text;
+      //Duration elapsedTime = Duration(seconds: swatch.counter);
+      //DateTime startTime = DateTime.now();
       try {
-        await collection.addActivity(
-            notes,
-            dropType,
-            {
-              'gyro': 10,
-              'accel': [1, 2, 3],
-            },
-            startTime,
-            elapsedTime,
-            startTime.add(elapsedTime));
+        await Provider.of<Collection>(context, listen: false)
+            .addActivity(_newActivity);
       } catch (error) {
         await showDialog(
           context: context,
@@ -96,8 +97,6 @@ class _AddActvityFormState extends State<AddActvityForm> {
           isLoading = false;
         },
       );
-
-      print(hoursStr + minutesStr + secondsStr);
     }
   }
 
@@ -108,7 +107,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
 
   @override
   Widget build(BuildContext context) {
-    Collection collection = Provider.of<Collection>(context);
+    //
     MyStopwatch swatch = Provider.of<MyStopwatch>(context);
     return Form(
       key: _formKey,
@@ -142,16 +141,28 @@ class _AddActvityFormState extends State<AddActvityForm> {
                       ],
                     ),
                     child: TextFormField(
-                        controller: notesController,
-                        decoration: const InputDecoration(
-                          labelText: 'Notes',
-                        ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Enter some notes';
-                          }
-                          return null;
-                        }),
+                      controller: notesController,
+                      decoration: const InputDecoration(
+                        labelText: 'Notes',
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Enter some notes';
+                        }
+                        return null;
+                      },
+                      onSaved: (newValue) {
+                        _newActivity = Activity(
+                          notes: newValue,
+                          id: _newActivity.id,
+                          data: _newActivity.data,
+                          duration: _newActivity.duration,
+                          endTime: _newActivity.endTime,
+                          startTime: _newActivity.startTime,
+                          type: _newActivity.type,
+                        );
+                      },
+                    ),
                   ),
                   Container(
                     //color: Colors.purple,
@@ -167,7 +178,15 @@ class _AddActvityFormState extends State<AddActvityForm> {
                       ),
                       onChanged: (String newValue) {
                         setState(() {
-                          dropType = newValue;
+                          _newActivity = Activity(
+                            data: _newActivity.data,
+                            duration: _newActivity.duration,
+                            endTime: _newActivity.endTime,
+                            id: _newActivity.id,
+                            notes: _newActivity.notes,
+                            startTime: _newActivity.startTime,
+                            type: newValue,
+                          );
                           print(dropType);
                         });
                       },
@@ -237,7 +256,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
                             ),
                             RaisedButton(
                               child: Text('Submit'),
-                              onPressed: () => _submit(swatch, collection),
+                              onPressed: () => _submit(swatch),
                             ),
                           ],
                         )

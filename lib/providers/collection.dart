@@ -99,22 +99,6 @@ class Collection with ChangeNotifier {
     return _activities.where((act) => (act.type == type)).toList();
   }
 
-  Duration strToDuration(String s) {
-    int hours = 0;
-    int minutes = 0;
-    //int seconds = 0;
-    int micros;
-    List<String> parts = s.split(':');
-    if (parts.length > 2) {
-      hours = int.parse(parts[parts.length - 3]);
-    }
-    if (parts.length > 1) {
-      minutes = int.parse(parts[parts.length - 2]);
-    }
-    micros = (double.parse(parts[parts.length - 1]) * 1000000).round();
-    return Duration(hours: hours, minutes: minutes, microseconds: micros);
-  }
-
   Future<void> initSetActivities() async {
     final url =
         'https://gaitmate.firebaseio.com/$userId/activities.json?auth=$authToken';
@@ -129,7 +113,7 @@ class Collection with ChangeNotifier {
             Activity(
               id: id,
               data: data['data'],
-              duration: strToDuration(data['duration']),
+              duration: data['duration'],
               endTime: DateTime.parse(data['endTime']),
               notes: data['notes'],
               startTime: DateTime.parse(data['startTime']),
@@ -146,8 +130,7 @@ class Collection with ChangeNotifier {
     }
   }
 
-  Future<void> addActivity(String notes, String type, Map<String, Object> data,
-      DateTime startTime, Duration duration, DateTime endTime) async {
+  Future<void> addActivity(Activity activity) async {
     final url =
         'https://gaitmate.firebaseio.com/$userId/activities.json?auth=$authToken';
     try {
@@ -155,23 +138,23 @@ class Collection with ChangeNotifier {
         url,
         body: json.encode(
           {
-            'notes': notes,
-            'type': type,
-            'data': data,
-            'startTime': startTime.toString(),
-            'duration': duration.toString(),
-            'endTime': endTime.toString(),
+            'notes': activity.notes,
+            'type': activity.type,
+            'data': activity.data,
+            'startTime': activity.startTime.toString(),
+            'duration': activity.duration.toString(),
+            'endTime': activity.endTime.toString(),
           },
         ),
       );
       final newActivity = Activity(
         id: json.decode(response.body)['name'],
-        data: data,
-        type: type,
-        duration: duration,
-        notes: notes,
-        startTime: startTime,
-        endTime: endTime,
+        data: activity.data,
+        type: activity.type,
+        duration: activity.duration,
+        notes: activity.notes,
+        startTime: activity.startTime,
+        endTime: activity.endTime,
       );
       _activities.add(newActivity);
       notifyListeners();

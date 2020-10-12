@@ -6,7 +6,7 @@ class Activity with ChangeNotifier {
   final String type;
   final Map<String, Object> data;
   final DateTime startTime;
-  final Duration duration;
+  final String duration;
   final DateTime endTime;
 
   Activity({
