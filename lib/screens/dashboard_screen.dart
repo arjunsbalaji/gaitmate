@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gaitmate/screens/add_activity_screen.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import '../widgets/collections_preview.dart';
 import '../providers/collection.dart';
@@ -10,6 +12,15 @@ class DashboardScreen extends StatelessWidget {
     final Collection collection = Provider.of<Collection>(context);
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).primaryColor,
+        ),
+        onPressed: () {
+          Navigator.of(context).pushNamed(AddActivityScreen.routeName);
+        },
+      ),
       body: Container(
         padding: EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 10),
         child: Column(
@@ -52,7 +63,7 @@ class DashboardScreen extends StatelessWidget {
                   letterSpacing: 1.5,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

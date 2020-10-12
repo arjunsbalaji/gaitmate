@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gaitmate/providers/collection.dart';
 import 'package:gaitmate/providers/stopwatch.dart';
+import 'package:gaitmate/screens/add_activity_screen.dart';
 import 'package:gaitmate/screens/auth_screen.dart';
 import 'package:gaitmate/screens/dashboard_screen.dart';
 import 'package:gaitmate/screens/splash_screen.dart';
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
           routes: {
             TabScreen.routeName: (ctx) => TabScreen(),
             DashboardScreen.routeName: (ctx) => DashboardScreen(),
+            AddActivityScreen.routeName: (ctx) => AddActivityScreen(),
           },
         ),
       ),

@@ -103,9 +103,13 @@ class CollectionListView extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 //crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(formatter
-                                      .format(activities[index].startTime)),
-                                  Text(activities[index].duration.toString())
+                                  Text(
+                                    formatter
+                                        .format(activities[index].startTime),
+                                  ),
+                                  Text(
+                                    activities[index].duration.toString(),
+                                  )
                                 ],
                               ),
                             ),

@@ -28,6 +28,7 @@ dependencies:
   http: ^0.12.2
   shared_preferences: ^0.5.12
   geolocator: ^6.0.0+4
+  image_picker: ^0.6.7+11
   # get: ^3.5.1
 
 

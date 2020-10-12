@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
 import '../providers/stopwatch.dart';
+import '../providers/activity.dart';
 
 class AddActvityForm extends StatefulWidget {
   @override
@@ -20,6 +21,19 @@ class _AddActvityFormState extends State<AddActvityForm> {
   final notesController = TextEditingController();
   Random random = new Random(); //this is just here for now
   //Stopwatch stopwatch = new Stopwatch();
+
+  Activity newActivity = Activity(
+    id: '',
+    data: null,
+    notes: '',
+    type: 'run',
+    startTime: DateTime.now(),
+    duration: Duration(seconds: 0),
+    endTime: DateTime.now().add(
+      Duration(seconds: 100),
+    ),
+  );
+
   bool recording = false;
   bool submittable = false;
 
@@ -30,9 +44,16 @@ class _AddActvityFormState extends State<AddActvityForm> {
   bool isLoading = false;
 
   void _recordChange() {
-    setState(() {
-      recording = !recording;
-    });
+    setState(
+      () {
+        recording = !recording;
+      },
+    );
+  }
+
+  void _reset(MyStopwatch swatch) {
+    _formKey.currentState.reset();
+    swatch.reset();
   }
 
   Future<void> _submit(MyStopwatch swatch, Collection collection) async {
@@ -47,6 +68,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
       String notes = notesController.text;
       Duration elapsedTime = Duration(seconds: swatch.counter);
       DateTime startTime = DateTime.now();
+
       try {
         await collection.addActivity(
             notes,
@@ -81,7 +103,6 @@ class _AddActvityFormState extends State<AddActvityForm> {
 
   @override
   void dispose() {
-    
     super.dispose();
   }
 
@@ -93,12 +114,18 @@ class _AddActvityFormState extends State<AddActvityForm> {
       key: _formKey,
       child: Container(
         //color: Colors.yellow,
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.only(
+          left: 10,
+          right: 10,
+          bottom: 10,
+          top: 70,
+        ),
         child: isLoading
             ? Center(
                 child: CircularProgressIndicator(),
               )
             : Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
                     padding: EdgeInsets.all(10),
@@ -197,12 +224,25 @@ class _AddActvityFormState extends State<AddActvityForm> {
                     ),
                   ),
                   (submittable && !recording)
-                      ? RaisedButton(
-                          child: Text('Submit'),
-                          onPressed: () => _submit(swatch, collection),
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            RaisedButton(
+                              child: Text('Reset'),
+                              onPressed: () => _reset(swatch),
+                            ),
+                            SizedBox(
+                              width: 20,
+                              height: 100,
+                            ),
+                            RaisedButton(
+                              child: Text('Submit'),
+                              onPressed: () => _submit(swatch, collection),
+                            ),
+                          ],
                         )
                       : SizedBox(
-                          height: 10,
+                          height: 100,
                           width: 10,
                         ),
                 ],

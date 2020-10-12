@@ -21,10 +21,6 @@ class _TabScreenState extends State<TabScreen> {
         'title': 'Dashboard',
       },
       {
-        'page': AddActivityScreen(),
-        'title': 'Activity',
-      },
-      {
         'page': AccountScreen(),
         'title': 'Accounts',
       }
@@ -57,12 +53,6 @@ class _TabScreenState extends State<TabScreen> {
             title: SizedBox.shrink(),
             icon: Icon(
               Icons.dashboard,
-            ),
-          ),
-          BottomNavigationBarItem(
-            title: SizedBox.shrink(),
-            icon: Icon(
-              Icons.add,
             ),
           ),
           BottomNavigationBarItem(
