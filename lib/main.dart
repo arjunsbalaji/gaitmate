@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gaitmate/providers/collection.dart';
+import 'package:gaitmate/providers/details.dart';
 import 'package:gaitmate/providers/stopwatch.dart';
 import 'package:gaitmate/screens/add_activity_screen.dart';
 import 'package:gaitmate/screens/auth_screen.dart';
 import 'package:gaitmate/screens/dashboard_screen.dart';
+import 'package:gaitmate/screens/details_screen.dart';
 import 'package:gaitmate/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 import './screens/tabs_screen.dart';
@@ -32,6 +34,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(
+          create: (_) => Details(),
+        ),
+        ChangeNotifierProvider(
           create: (_) => MyStopwatch(),
         )
       ],
@@ -58,6 +63,7 @@ class MyApp extends StatelessWidget {
             TabScreen.routeName: (ctx) => TabScreen(),
             DashboardScreen.routeName: (ctx) => DashboardScreen(),
             AddActivityScreen.routeName: (ctx) => AddActivityScreen(),
+            DetailsScreen.routeName: (ctx) => DetailsScreen(),
           },
         ),
       ),

@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:gaitmate/providers/collection.dart';
-import 'package:gaitmate/providers/stopwatch.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'dart:math';
+
+import '../providers/collection.dart';
 import '../providers/stopwatch.dart';
+import '../widgets/input_image.dart';
 import '../providers/activity.dart';
 
 class AddActvityForm extends StatefulWidget {
@@ -35,6 +36,21 @@ class _AddActvityFormState extends State<AddActvityForm> {
   bool recording = false;
   bool submittable = false;
   bool isLoading = false;
+  bool imageExists = false;
+  File _pickedImage;
+
+  void _selectImage(File pickedImage) {
+    setState(() {
+      _pickedImage = pickedImage;
+    });
+    //bool imageExists = true;
+  }
+
+  void _redoImage() {
+    setState(() {
+      _pickedImage = null;
+    });
+  }
 
   void _recordChange() {
     setState(
@@ -70,7 +86,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
       //IF I AM
       //RECORDING AND GO OFF THE PAGE TIMER ISNT CANCELLED
       //SO NEED TO PUT THAT IN
-      //String id = DateTime.now().millisecondsSinceEpoch.toString();
+      //Strin g id = DateTime.now().millisecondsSinceEpoch.toString();
       setState(() {
         isLoading = true;
       });
@@ -127,6 +143,79 @@ class _AddActvityFormState extends State<AddActvityForm> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
+                    margin: EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 6.0,
+                          color: Colors.black26,
+                          offset: Offset(0, 2),
+                        )
+                      ],
+                    ),
+                    child: _pickedImage == null
+                        ? Text('Take an Image!')
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.file(
+                              _pickedImage,
+                              fit: BoxFit.cover,
+                              width: MediaQuery.of(context).size.width * 0.4,
+                            ),
+                          ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _pickedImage == null
+                          ? SizedBox(
+                              width: 5,
+                            )
+                          : IconButton(
+                              icon: Icon(Icons.redo),
+                              onPressed: _redoImage,
+                            ),
+                      InputImage(_selectImage),
+                      Container(
+                        //color: Colors.purple,
+                        alignment: Alignment.center,
+                        child: DropdownButton<String>(
+                          value: dropType,
+                          icon: Icon(Icons.arrow_drop_down),
+                          elevation: 16,
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                          underline: Container(
+                            height: 2,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          onChanged: (String newValue) {
+                            setState(() {
+                              _newActivity = Activity(
+                                data: _newActivity.data,
+                                duration: _newActivity.duration,
+                                endTime: _newActivity.endTime,
+                                id: _newActivity.id,
+                                notes: _newActivity.notes,
+                                startTime: _newActivity.startTime,
+                                type: newValue,
+                              );
+                              print(dropType);
+                            });
+                          },
+                          items: <String>['run', 'walk']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
                     padding: EdgeInsets.all(10),
                     //color: Colors.lime,
                     decoration: BoxDecoration(
@@ -165,41 +254,6 @@ class _AddActvityFormState extends State<AddActvityForm> {
                     ),
                   ),
                   Container(
-                    //color: Colors.purple,
-                    alignment: Alignment.center,
-                    child: DropdownButton<String>(
-                      value: dropType,
-                      icon: Icon(Icons.arrow_drop_down),
-                      elevation: 16,
-                      style: TextStyle(color: Theme.of(context).primaryColor),
-                      underline: Container(
-                        height: 2,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      onChanged: (String newValue) {
-                        setState(() {
-                          _newActivity = Activity(
-                            data: _newActivity.data,
-                            duration: _newActivity.duration,
-                            endTime: _newActivity.endTime,
-                            id: _newActivity.id,
-                            notes: _newActivity.notes,
-                            startTime: _newActivity.startTime,
-                            type: newValue,
-                          );
-                          print(dropType);
-                        });
-                      },
-                      items: <String>['run', 'walk']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  Container(
                     child: Text(
                       swatch.totalDuration,
                       style: TextStyle(
@@ -208,7 +262,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 20),
+                    margin: EdgeInsets.only(top: 10),
                     height: 80,
                     width: 80,
                     child: RaisedButton(
