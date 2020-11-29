@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
   bool isLoading = false;
   bool imageExists = false;
   Position _position;
+  String _currentAddress;
 
   File _pickedImage;
 
@@ -48,6 +50,12 @@ class _AddActvityFormState extends State<AddActvityForm> {
       setState(() {
         _position = position;
       });
+    }).catchError((e) {
+      print(e);
+    });
+    placemarkFromCoordinates(_position.latitude, _position.longitude)
+        .then((List<Placemark> placemark) {
+      _currentAddress = placemark[0].toString();
     }).catchError((e) {
       print(e);
     });
@@ -309,6 +317,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
                         _getPosition();
                         print(recording);
                         print(_position.latitude.toString());
+                        print(_currentAddress);
                       },
                     ),
                   ),
