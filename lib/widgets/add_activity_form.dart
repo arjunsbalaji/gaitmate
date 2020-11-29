@@ -6,6 +6,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../providers/collection.dart';
 import '../providers/stopwatch.dart';
@@ -22,6 +23,8 @@ class _AddActvityFormState extends State<AddActvityForm> {
   String dropType = 'run';
   final DateFormat formatter = DateFormat('dd-MM-yyyy');
   final notesController = TextEditingController();
+
+  Completer<GoogleMapController> _gMapsController = Completer();
 
   Activity _newActivity = Activity(
     id: null,
@@ -59,6 +62,13 @@ class _AddActvityFormState extends State<AddActvityForm> {
     }).catchError((e) {
       print(e);
     });
+  }
+
+  CameraPosition _getCameraPosition(Position position) {
+    return CameraPosition(
+      target: LatLng(position.latitude, position.longitude),
+      zoom: 20,
+    );
   }
 
   void _selectImage(File pickedImage) {
@@ -164,6 +174,34 @@ class _AddActvityFormState extends State<AddActvityForm> {
             : Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  Container(
+                    height: 100,
+                    margin: EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 6.0,
+                          color: Colors.black26,
+                          offset: Offset(0, 2),
+                        )
+                      ],
+                    ),
+                    child: _position == null
+                        ? Text('no location!')
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: GoogleMap(
+                              mapType: MapType.hybrid,
+                              initialCameraPosition:
+                                  _getCameraPosition(_position),
+                              onMapCreated:
+                                  (GoogleMapController gMapsController) {
+                                _gMapsController.complete(gMapsController);
+                              },
+                            ),
+                          ),
+                  ),
                   Container(
                     margin: EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
