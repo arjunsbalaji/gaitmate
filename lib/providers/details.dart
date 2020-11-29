@@ -20,16 +20,12 @@ class Details with ChangeNotifier {
         );
       },
     );
-    //_userProperties = dataList;
-    //print(_userProperties.toString());
     notifyListeners();
   }
 
   void updateUserProperties(Map<String, Object> newUserProperties) {
     _userProperties = newUserProperties;
     notifyListeners();
-    //print(newUserProperties.toString());
     DBHelper.insert('user_details', newUserProperties);
-    //print(DBHelper.getData('user_details').toString());
   }
 }

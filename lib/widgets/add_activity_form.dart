@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -37,7 +38,20 @@ class _AddActvityFormState extends State<AddActvityForm> {
   bool submittable = false;
   bool isLoading = false;
   bool imageExists = false;
+  Position _position;
+
   File _pickedImage;
+
+  void _getPosition() {
+    Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+      setState(() {
+        _position = position;
+      });
+    }).catchError((e) {
+      print(e);
+    });
+  }
 
   void _selectImage(File pickedImage) {
     setState(() {
@@ -292,7 +306,9 @@ class _AddActvityFormState extends State<AddActvityForm> {
                         _recordChange();
                         recording ? swatch.start() : swatch.pause();
                         submittable = true;
+                        _getPosition();
                         print(recording);
+                        print(_position.latitude.toString());
                       },
                     ),
                   ),
