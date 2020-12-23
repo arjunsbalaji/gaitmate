@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gaitmate/providers/collection.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/activity.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,9 +11,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ActivityScreen extends StatelessWidget {
   final Activity activity;
+  final int index;
 
   Completer<GoogleMapController> _gMapsController = Completer();
-  ActivityScreen(this.activity);
+  ActivityScreen(this.activity, this.index);
 
   CameraPosition _getCameraPosition(Position position) {
     return CameraPosition(
@@ -23,19 +25,22 @@ class ActivityScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(activity.position.toString());
+    //print(activity.position.toString());
     return Scaffold(
       body: Container(
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
             SizedBox(
-              height: 20,
+              height: 40,
             ),
             Row(
               children: [
                 Expanded(
-                  child: Text(activity.notes),
+                  child: Text(
+                    "${DateFormat.yMMMd('en_US').format(activity.startTime)} #${index + 1}",
+                    style: TextStyle(fontSize: 34),
+                  ),
                 ),
                 IconButton(
                   icon: Icon(Icons.delete),
@@ -47,14 +52,10 @@ class ActivityScreen extends StatelessWidget {
                 )
               ],
             ),
-            Text(
-              "Activity Time: ${activity.duration.inMinutes} mins ${activity.duration.inSeconds} secs",
-              style: TextStyle(fontSize: 20),
-            ),
             Container(
               height: MediaQuery.of(context).size.height * 0.4,
               width: MediaQuery.of(context).size.width * 0.9,
-              margin: EdgeInsets.only(top: 20, bottom: 20),
+              margin: EdgeInsets.only(top: 20, bottom: 25),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 boxShadow: [
@@ -76,6 +77,17 @@ class ActivityScreen extends StatelessWidget {
                 ),
               ),
             ),
+            Text(
+              "Activity Time: ${activity.duration.inMinutes} mins ${activity.duration.inSeconds} secs",
+              style: TextStyle(fontSize: 20),
+            ),
+            Divider(
+              color: Colors.black,
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 5),
+              child: Text(activity.notes, style: TextStyle(fontSize: 20)),
+            )
           ],
         ),
       ),

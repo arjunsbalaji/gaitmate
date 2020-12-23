@@ -19,7 +19,7 @@ class CollectionListView extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(
-              top: 30, left: 10.0, right: 10.0, bottom: 10.0),
+              top: 40, left: 10.0, right: 10.0, bottom: 0.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -27,7 +27,7 @@ class CollectionListView extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
-                    fontSize: 32.0,
+                    fontSize: 38.0,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                   ),
@@ -45,12 +45,13 @@ class CollectionListView extends StatelessWidget {
               itemBuilder: (context, int index) {
                 return GestureDetector(
                   onTap: () {
-                    print(activities[index].position);
+                    //print(activities[index].position);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ActivityScreen(
                           activities[index],
+                          index,
                         ),
                       ),
                     );
@@ -60,7 +61,7 @@ class CollectionListView extends StatelessWidget {
                     margin:
                         EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
                     child: Container(
-                      height: 100.0,
+                      height: MediaQuery.of(context).size.height * 0.15,
                       decoration: BoxDecoration(
                           color: Colors.white,
                           boxShadow: [
@@ -85,32 +86,46 @@ class CollectionListView extends StatelessWidget {
                                       letterSpacing: 1.2,
                                       fontSize: 22.0),
                                 ),
-                                Text(
-                                  activities[index].notes,
-                                  style: TextStyle(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 1.2,
-                                      fontSize: 14.0),
+                                Expanded(
+                                  child: ShaderMask(
+                                    shaderCallback: (rect) {
+                                      return LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.black,
+                                          Colors.transparent
+                                        ],
+                                      ).createShader(Rect.fromLTRB(
+                                          0, 0, rect.width, rect.height));
+                                    },
+                                    blendMode: BlendMode.dstIn,
+                                    child: Container(
+                                      margin: EdgeInsets.only(top: 5),
+                                      //color: Colors.red,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.5,
+                                      child: Text(
+                                        activities[index].notes,
+                                        style: TextStyle(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 1.2,
+                                            fontSize: 14.0),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                           Expanded(
                             child: Container(
-                              //color: Colors.red,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                //crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    formatter
-                                        .format(activities[index].startTime),
-                                  ),
-                                  Text(
-                                    activities[index].duration.toString(),
-                                  ),
-                                ],
+                              //color: Colors.green,
+                              child: Text(
+                                "${activities[index].duration.inMinutes}m ${activities[index].duration.inSeconds}s",
+                                style: TextStyle(fontSize: 20),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
