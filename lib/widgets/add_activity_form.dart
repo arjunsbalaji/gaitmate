@@ -55,7 +55,10 @@ class _AddActvityFormState extends State<AddActvityForm> {
     }).catchError((e) {
       print(e);
     });
-    placemarkFromCoordinates(_position.latitude, _position.longitude)
+  }
+
+  void _getAddress(Position position) {
+    placemarkFromCoordinates(position.latitude, position.longitude)
         .then((List<Placemark> placemark) {
       Placemark place = placemark[0];
       setState(() {
@@ -146,6 +149,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
   @override
   Widget build(BuildContext context) {
     (_position is Position) ? print('hello') : _getPosition();
+    _getAddress(_position);
     print(_position.toString());
     MyStopwatch swatch = Provider.of<MyStopwatch>(context);
     return Form(

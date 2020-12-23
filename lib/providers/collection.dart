@@ -137,7 +137,7 @@ class Collection with ChangeNotifier {
               type: data['type'],
               position: Position(
                   latitude: data['position'][0],
-                  longitude: data['position'][0]),
+                  longitude: data['position'][1]),
             ),
           );
         },
