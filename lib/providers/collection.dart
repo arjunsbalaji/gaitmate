@@ -118,6 +118,7 @@ class Collection with ChangeNotifier {
               notes: data['notes'],
               startTime: DateTime.parse(data['startTime']),
               type: data['type'],
+              position: data['position'],
             ),
           );
         },
@@ -144,6 +145,7 @@ class Collection with ChangeNotifier {
             'startTime': activity.startTime.toString(),
             'duration': activity.duration.toString(),
             'endTime': activity.endTime.toString(),
+            'position': activity.position.toString(),
           },
         ),
       );
@@ -155,6 +157,7 @@ class Collection with ChangeNotifier {
         notes: activity.notes,
         startTime: activity.startTime,
         endTime: activity.endTime,
+        position: activity.position,
       );
       _activities.add(newActivity);
       notifyListeners();

@@ -226,6 +226,7 @@ class _AuthCardState extends State<AuthCard> {
                             if (value != _passwordController.text) {
                               return 'Passwords don\'t match';
                             }
+                            return null;
                           }
                         : null,
                   ),
