@@ -79,14 +79,14 @@ class CollectionListView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  activities[index].notes,
+                                  "${DateFormat.yMMMd('en_US').format(activities[index].startTime)} #${index + 1}",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 1.2,
                                       fontSize: 22.0),
                                 ),
                                 Text(
-                                  activities[index].id,
+                                  activities[index].notes,
                                   style: TextStyle(
                                       color: Colors.grey,
                                       fontWeight: FontWeight.w600,

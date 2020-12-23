@@ -48,7 +48,9 @@ class ActivityScreen extends StatelessWidget {
               ],
             ),
             Text(
-                "${activity.position.latitude},${activity.position.longitude}"),
+              "Activity Time: ${activity.duration.inMinutes} mins ${activity.duration.inSeconds} secs",
+              style: TextStyle(fontSize: 20),
+            ),
             Container(
               height: MediaQuery.of(context).size.height * 0.4,
               width: MediaQuery.of(context).size.width * 0.9,
