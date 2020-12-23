@@ -45,7 +45,7 @@ class CollectionListView extends StatelessWidget {
               itemBuilder: (context, int index) {
                 return GestureDetector(
                   onTap: () {
-                    print(activities[index].id);
+                    print(activities[index].position);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -109,7 +109,7 @@ class CollectionListView extends StatelessWidget {
                                   ),
                                   Text(
                                     activities[index].duration.toString(),
-                                  )
+                                  ),
                                 ],
                               ),
                             ),

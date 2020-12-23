@@ -6,6 +6,7 @@ import 'activity.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:geolocator/geolocator.dart';
 
 class Collection with ChangeNotifier {
   final String title;
@@ -99,6 +100,22 @@ class Collection with ChangeNotifier {
     return _activities.where((act) => (act.type == type)).toList();
   }
 
+  Duration strToDuration(String s) {
+    int hours = 0;
+    int minutes = 0;
+    //int seconds = 0;
+    int micros;
+    List<String> parts = s.split(':');
+    if (parts.length > 2) {
+      hours = int.parse(parts[parts.length - 3]);
+    }
+    if (parts.length > 1) {
+      minutes = int.parse(parts[parts.length - 2]);
+    }
+    micros = (double.parse(parts[parts.length - 1]) * 1000000).round();
+    return Duration(hours: hours, minutes: minutes, microseconds: micros);
+  }
+
   Future<void> initSetActivities() async {
     final url =
         'https://gaitmate.firebaseio.com/$userId/activities.json?auth=$authToken';
@@ -113,12 +130,14 @@ class Collection with ChangeNotifier {
             Activity(
               id: id,
               data: data['data'],
-              duration: data['duration'],
+              duration: strToDuration(data['duration']),
               endTime: DateTime.parse(data['endTime']),
               notes: data['notes'],
               startTime: DateTime.parse(data['startTime']),
               type: data['type'],
-              position: data['position'],
+              position: Position(
+                  latitude: data['position'][0],
+                  longitude: data['position'][0]),
             ),
           );
         },
@@ -145,7 +164,10 @@ class Collection with ChangeNotifier {
             'startTime': activity.startTime.toString(),
             'duration': activity.duration.toString(),
             'endTime': activity.endTime.toString(),
-            'position': activity.position.toString(),
+            'position': [
+              activity.position.latitude,
+              activity.position.longitude
+            ],
           },
         ),
       );

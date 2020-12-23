@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
           value: Auth(),
         ),
         ChangeNotifierProxyProvider<Auth, Collection>(
-          //create: (_) => null,
+          create: (_) => null,
           update: (ctx, auth, prevCollection) => Collection(
             'Name',
             'Bio',
