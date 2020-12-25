@@ -194,6 +194,9 @@ class _AuthCardState extends State<AuthCard> {
                     if (value.isEmpty || !value.contains('@')) {
                       return 'Invalid email!';
                     }
+                    if (value.contains(' ')) {
+                      return 'Remove the spaces in your email!';
+                    }
                     return null;
                   },
                   onSaved: (value) {
