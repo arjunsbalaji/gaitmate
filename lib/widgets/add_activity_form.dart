@@ -26,7 +26,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
 
   Activity _newActivity = Activity(
     id: null,
-    data: null,
+    data: {},
     notes: '',
     type: 'run',
     startTime: DateTime.now(),
@@ -43,6 +43,8 @@ class _AddActvityFormState extends State<AddActvityForm> {
   bool imageExists = false;
   Position _position;
   String _currentAddress;
+  double _painRating = 0;
+  double _confidenceRating = 0;
 
   Future<void> _getPosition() async {
     Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low)
@@ -154,190 +156,243 @@ class _AddActvityFormState extends State<AddActvityForm> {
     MyStopwatch swatch = Provider.of<MyStopwatch>(context);
     return Form(
       key: _formKey,
-      child: Container(
-        //color: Colors.yellow,
-        padding: EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-          top: 70,
-        ),
-        child: isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Container(
-                height: MediaQuery.of(context).size.height * 0.9,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    _position != null
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                //color: Colors.red,
-                                margin: EdgeInsets.only(
-                                    top: 20, left: 10, bottom: 20),
-                                child: Text(
-                                  "You're in $_currentAddress today!",
-                                  style: TextStyle(fontSize: 22),
+      child: SingleChildScrollView(
+        child: Container(
+          //color: Colors.yellow,
+          padding: EdgeInsets.only(
+            left: 10,
+            right: 10,
+            bottom: 10,
+            top: 70,
+          ),
+          child: isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Container(
+                  height: MediaQuery.of(context).size.height * 0.9,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _position != null
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  //color: Colors.red,
+                                  margin: EdgeInsets.only(
+                                      top: 20, left: 10, bottom: 20),
+                                  child: Text(
+                                    "You're in $_currentAddress today!",
+                                    style: TextStyle(fontSize: 22),
+                                  ),
                                 ),
+                              ],
+                            )
+                          : Container(
+                              child: Text('No Location!'),
+                            ),
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        //color: Colors.lime,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF3F5F7),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 6.0,
+                              color: Colors.black26,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: TextFormField(
+                          controller: notesController,
+                          decoration: const InputDecoration(
+                            labelText: 'Notes about your activity...',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Enter some notes';
+                            }
+                            return null;
+                          },
+                          onSaved: (newValue) {
+                            _newActivity.endTime
+                                .difference(_newActivity.startTime)
+                                .toString();
+                            _newActivity = Activity(
+                              notes: newValue,
+                              id: _newActivity.id,
+                              data: _newActivity.data,
+                              duration: _newActivity.endTime
+                                  .difference(_newActivity.startTime),
+                              endTime: _newActivity.endTime,
+                              startTime: _newActivity.startTime,
+                              type: selectedType.toString().split('.')[1],
+                              position: _position,
+                            );
+                          },
+                        ),
+                      ),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Expanded(
+                              child: RadioListTile<ActivityType>(
+                                subtitle: Text('Walk'),
+                                value: ActivityType.walk,
+                                groupValue: selectedType,
+                                onChanged: (ActivityType value) {
+                                  setState(() {
+                                    selectedType = value;
+                                  });
+                                },
                               ),
-                            ],
-                          )
-                        : Container(
-                            child: Text('No Location!'),
-                          ),
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      //color: Colors.lime,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF3F5F7),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 6.0,
-                            color: Colors.black26,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: TextFormField(
-                        controller: notesController,
-                        decoration: const InputDecoration(
-                          labelText: 'Notes about your activity...',
+                            ),
+                            Expanded(
+                              child: RadioListTile<ActivityType>(
+                                subtitle: Text('Run'),
+                                value: ActivityType.run,
+                                groupValue: selectedType,
+                                onChanged: (ActivityType value) {
+                                  setState(() {
+                                    selectedType = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Enter some notes';
-                          }
-                          return null;
-                        },
-                        onSaved: (newValue) {
-                          _newActivity.endTime
-                              .difference(_newActivity.startTime)
-                              .toString();
-                          _newActivity = Activity(
-                            notes: newValue,
-                            id: _newActivity.id,
-                            data: _newActivity.data,
-                            duration: _newActivity.endTime
-                                .difference(_newActivity.startTime),
-                            endTime: _newActivity.endTime,
-                            startTime: _newActivity.startTime,
-                            type: selectedType.toString().split('.')[1],
-                            position: _position,
-                          );
-                        },
                       ),
-                    ),
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.1,
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          Expanded(
-                            child: RadioListTile<ActivityType>(
-                              subtitle: Text('Walk'),
-                              value: ActivityType.walk,
-                              groupValue: selectedType,
-                              onChanged: (ActivityType value) {
-                                setState(() {
-                                  selectedType = value;
-                                });
-                              },
+                      Container(
+                        //color: Colors.blue,
+                        child: Column(
+                          children: [
+                            Text(
+                              'Pain Rating',
+                              style: TextStyle(fontSize: 20),
+                              textAlign: TextAlign.start,
+                            ),
+                            Slider(
+                                value: _painRating,
+                                max: 10,
+                                min: 0,
+                                label: _painRating.toString(),
+                                onChanged: (double value) {
+                                  setState(() {
+                                    //print(value);
+                                    _newActivity.data['painRating'] = value;
+                                    _painRating = value;
+                                  });
+                                }),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        //color: Colors.blue,
+                        child: Column(
+                          children: [
+                            Text(
+                              'Confidence during activity',
+                              style: TextStyle(fontSize: 20),
+                              textAlign: TextAlign.start,
+                            ),
+                            Slider(
+                                value: _confidenceRating,
+                                max: 10,
+                                min: 0,
+                                label: _confidenceRating.toString(),
+                                onChanged: (double value) {
+                                  setState(() {
+                                    //print(value);
+                                    //print(_newActivity.data.toString());
+                                    _newActivity.data['confidenceRating'] =
+                                        value;
+                                    _confidenceRating = value;
+                                  });
+                                }),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: Text(
+                          swatch.totalDuration,
+                          style: TextStyle(
+                            fontSize: 70.0,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 10),
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        width: MediaQuery.of(context).size.height * 0.1,
+                        child: RaisedButton(
+                          color: recording
+                              ? Colors.redAccent
+                              : Theme.of(context).primaryColor,
+                          elevation: 10.0,
+                          child: Container(
+                            //color: Colors.blue,
+                            width: MediaQuery.of(context).size.height * 0.05,
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            child: Column(
+                              children: [
+                                recording
+                                    ? Icon(Icons.stop)
+                                    : Icon(Icons.play_arrow),
+                                recording ? Text('Stop') : Text('Start'),
+                              ],
                             ),
                           ),
-                          Expanded(
-                            child: RadioListTile<ActivityType>(
-                              subtitle: Text('Run'),
-                              value: ActivityType.run,
-                              groupValue: selectedType,
-                              onChanged: (ActivityType value) {
-                                setState(() {
-                                  selectedType = value;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        swatch.totalDuration,
-                        style: TextStyle(
-                          fontSize: 70.0,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      height: MediaQuery.of(context).size.height * 0.1,
-                      width: MediaQuery.of(context).size.height * 0.1,
-                      child: RaisedButton(
-                        color: recording
-                            ? Colors.redAccent
-                            : Theme.of(context).primaryColor,
-                        elevation: 10.0,
-                        child: Container(
-                          //color: Colors.blue,
-                          width: MediaQuery.of(context).size.height * 0.05,
-                          height: MediaQuery.of(context).size.height * 0.05,
-                          child: Column(
-                            children: [
-                              recording
-                                  ? Icon(Icons.stop)
-                                  : Icon(Icons.play_arrow),
-                              recording ? Text('Stop') : Text('Start'),
-                            ],
-                          ),
-                        ),
-                        shape: CircleBorder(
-                          side: BorderSide(
+                          shape: CircleBorder(
+                            side: BorderSide(
 
-                              //color: Theme.of(context).primaryColor,
-                              ),
-                        ),
-                        onPressed: () {
-                          _recordChange();
-                          recording ? swatch.start() : swatch.pause();
-                          submittable = true;
-                          //print(recording);
-                          //print(_position.latitude.toString());
-                          //print(_currentAddress);
-                          //print("recording...");
-                        },
-                      ),
-                    ),
-                    (submittable && !recording)
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              RaisedButton(
-                                child: Text('Reset'),
-                                onPressed: () => _reset(swatch),
-                              ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.1,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.1,
-                              ),
-                              RaisedButton(
-                                child: Text('Submit'),
-                                onPressed: () => _submit(context, swatch),
-                              ),
-                            ],
-                          )
-                        : SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.1,
-                            width: 10,
+                                //color: Theme.of(context).primaryColor,
+                                ),
                           ),
-                  ],
+                          onPressed: () {
+                            _recordChange();
+                            recording ? swatch.start() : swatch.pause();
+                            submittable = true;
+                            //print(recording);
+                            //print(_position.latitude.toString());
+                            //print(_currentAddress);
+                            //print("recording...");
+                          },
+                        ),
+                      ),
+                      (submittable && !recording)
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RaisedButton(
+                                  child: Text('Reset'),
+                                  onPressed: () => _reset(swatch),
+                                ),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                ),
+                                RaisedButton(
+                                  child: Text('Submit'),
+                                  onPressed: () => _submit(context, swatch),
+                                ),
+                              ],
+                            )
+                          : SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.1,
+                              width: 10,
+                            ),
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }

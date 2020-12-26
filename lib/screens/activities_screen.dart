@@ -49,7 +49,11 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.all(15.0),
-        child: CollectionListView(widget.title, activities),
+        child: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : CollectionListView(widget.title, activities),
       ),
     );
   }

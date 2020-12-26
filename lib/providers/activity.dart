@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
 class Activity with ChangeNotifier {

@@ -53,8 +53,8 @@ class ActivityScreen extends StatelessWidget {
               ],
             ),
             Container(
-              height: MediaQuery.of(context).size.height * 0.4,
-              width: MediaQuery.of(context).size.width * 0.9,
+              height: MediaQuery.of(context).size.height * 0.2,
+              width: MediaQuery.of(context).size.width * 0.8,
               margin: EdgeInsets.only(top: 20, bottom: 25),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
@@ -77,16 +77,45 @@ class ActivityScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Text(
-              "Activity Time: ${activity.duration.inMinutes} mins ${activity.duration.inSeconds} secs",
-              style: TextStyle(fontSize: 20),
+            Container(
+              child: Text(
+                "Activity Time: ${activity.duration.inMinutes} mins ${activity.duration.inSeconds} secs",
+                style: TextStyle(fontSize: 20),
+                textAlign: TextAlign.left,
+              ),
             ),
             Divider(
               color: Colors.black,
             ),
             Container(
+              alignment: Alignment.centerLeft,
               margin: EdgeInsets.only(top: 5),
-              child: Text(activity.notes, style: TextStyle(fontSize: 20)),
+              child: Text(
+                activity.notes,
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              margin: EdgeInsets.only(top: 5),
+              child: Text(
+                'Pain - ${(double.parse((activity.data['painRating']).toString())).toStringAsFixed(1)}/10',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              margin: EdgeInsets.only(top: 5),
+              child: Text(
+                'Confidence - ${(double.parse((activity.data['confidenceRating']).toString())).toStringAsFixed(1)}/10',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
             )
           ],
         ),

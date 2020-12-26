@@ -9,6 +9,7 @@ class CollectionListView extends StatelessWidget {
   //final Collection collection;
   final String title;
   //pass description through here
+
   final List<Activity> activities;
   CollectionListView(this.title, this.activities);
 
