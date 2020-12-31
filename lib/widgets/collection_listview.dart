@@ -1,19 +1,43 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gaitmate/providers/collection.dart';
-import 'package:provider/provider.dart';
 import '../providers/activity.dart';
-import 'package:intl/intl.dart';
 import '../screens/activity_screen.dart';
+import 'package:gaitmate/Services/database.dart';
+import 'package:intl/intl.dart';
 
-class CollectionListView extends StatelessWidget {
-  //final Collection collection;
+class CollectionListView extends StatefulWidget {
+
   final String title;
-  //pass description through here
+  final User user;
 
-  final List<Activity> activities;
-  CollectionListView(this.title, this.activities);
+  CollectionListView(this.title, this.user);
+  _CollectionListViewState createState() => _CollectionListViewState(title, user);
+}
 
+class _CollectionListViewState extends State<CollectionListView> {
+
+  final String title;
+  final User user;
   final DateFormat formatter = DateFormat('dd-MM-yyyy');
+
+  _CollectionListViewState(this.title, this.user);
+
+  List<Activity> activities = [];
+
+  void getActivities () {
+    final String type = title == 'Runs' ? 'run' : 'walk';
+    getActivitiesByType(user, type).then((activities) => {
+      this.setState(() {
+        this.activities = activities;
+      })
+    });
+  }
+  
+  void initState() {
+    super.initState();
+    getActivities();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -38,24 +62,16 @@ class CollectionListView extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Container(
-            //color: Colors.blue,
-            //height: (MediaQuery.of(context).size.height) * 0.8,
+          child: activities.isEmpty 
+            ? Center(child:CircularProgressIndicator())
+            : Container(
+
             child: ListView.builder(
               scrollDirection: Axis.vertical,
               itemBuilder: (context, int index) {
                 return GestureDetector(
                   onTap: () {
-                    //print(activities[index].position);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ActivityScreen(
-                          activities[index],
-                          index,
-                        ),
-                      ),
-                    );
+                    _navigatorAndReload(context, index);
                   },
                   child: Container(
                     //color: Colors.red,
@@ -142,5 +158,23 @@ class CollectionListView extends StatelessWidget {
         )
       ],
     );
+  }
+
+  _navigatorAndReload(BuildContext context, index) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ActivityScreen(
+          user,
+          activities[index],
+          index,
+        ),
+      ),
+    );
+    if (result == 'deleted') {
+      setState(() {
+        getActivities();
+      });
+    }
   }
 }

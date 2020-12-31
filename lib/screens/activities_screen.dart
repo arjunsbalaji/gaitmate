@@ -1,7 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gaitmate/providers/activity.dart';
-import 'package:gaitmate/providers/collection.dart';
-import 'package:provider/provider.dart';
 import '../widgets/collection_listview.dart';
 
 class ActivitiesScreen extends StatefulWidget {
@@ -9,51 +8,31 @@ class ActivitiesScreen extends StatefulWidget {
 
   //final List<Activity> actvities;
   final String title;
+  final User user;
 
-  ActivitiesScreen(this.title);
+  ActivitiesScreen(this.title, this.user);
 
   @override
-  _ActivitiesScreenState createState() => _ActivitiesScreenState();
+  _ActivitiesScreenState createState() => _ActivitiesScreenState(title, user);
 }
 
 class _ActivitiesScreenState extends State<ActivitiesScreen> {
-  bool _isInit = true;
 
-  bool _isLoading = false;
+  final String title;
+  final User user;
 
-  @override
-  void didChangeDependencies() {
-    if (_isInit) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<Collection>(context).initSetActivities().then(
-            (_) => setState(
-              () {
-                _isLoading = false;
-              },
-            ),
-          );
-    }
-    _isInit = false;
-    super.didChangeDependencies();
-  }
+  _ActivitiesScreenState(this.title, this.user);
 
+  List<Activity> activities = [];
+  
   @override
   Widget build(BuildContext context) {
-    final String type = widget.title == 'Runs' ? 'run' : 'walk';
-    //need to make this cleaner above
-    final List<Activity> activities =
-        Provider.of<Collection>(context).getActvitiesByType(type);
+ 
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.all(15.0),
-        child: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : CollectionListView(widget.title, activities),
+        child: CollectionListView(widget.title, user),
       ),
     );
   }

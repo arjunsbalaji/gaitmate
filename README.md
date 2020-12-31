@@ -1,16 +1,7 @@
-# gaitmate
+# Gait Mate 
 
-A new Flutter project.
+## Our Product 
+Current gait analysis technologies are lacking in one way or another. We are aiming to develop a cheap, real-time insole gait tracking system that will link to a user’s mobile phone. The mobile application will collate information about their gait and present it to them in an easy-to-understand way, empowering them to better understand their illness and how we treat it. This system will work by extracting features from their gait and presenting how these have evolved over time, giving users and their health care providers a better idea of the course of their illness. By collating this disease progression data over sets of users we can provide effective triaging for health care providers and institutions. By giving health care providers the ability to collect objective, accurate and constant gait analysis on the cloud we believe that we can streamline the care of users in medical, surgical, and allied health care contexts. This streamlining and triaging allows for more efficient delivery of health care services amongst a population, resulting in lower costs and better care for the end user.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Our Story
+We are a small group of young medical students and engineers based in Perth, WA. What we lack in size and funding, we make up for in tenacity and skill in solving the problems and serving users. We are at the start of a long journey to build things that people want. At the moment we think that people want better and more personalised gait tracking, but we could be wrong. We want to talk to as many people who work in health care to find out what the issues that they have are, and what we can do about them. This is our singular focus. It is worth reiterating because it is so important to us, and what we do. To best understand what our users need, we need to understand them first. As such, one of our goals is to build long lasting and strong relationships with our users, to the point of being friends. If we understand where you come from, what you love and how you see the world we can begin to care deeply about the issues you are facing. This is kind of relationship is a positive sum one. One where each of us get more than what we put in, and together we become more useful to our patients than we would be alone.

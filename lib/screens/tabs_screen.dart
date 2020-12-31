@@ -1,10 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gaitmate/screens/newdetailsScreen.dart';
 import './account_screen.dart';
 import './dashboard_screen.dart';
-import './add_activity_screen.dart';
+import 'package:gaitmate/helpers/size_config.dart';
+import 'package:gaitmate/providers/userDetails.dart';
 
 class TabScreen extends StatefulWidget {
-  static const routeName = '/tabscreen';
+
+  final User user;
+  final Duration needDetails;
+
+  TabScreen(this.user, this.needDetails);
+
   @override
   _TabScreenState createState() => _TabScreenState();
 }
@@ -17,11 +25,11 @@ class _TabScreenState extends State<TabScreen> {
   void initState() {
     _pages = [
       {
-        'page': DashboardScreen(),
+        'page': DashboardScreen(widget.user),
         'title': 'Dashboard',
       },
       {
-        'page': AccountScreen(),
+        'page': AccountScreen(widget.user),
         'title': 'Accounts',
       }
     ];
@@ -38,7 +46,10 @@ class _TabScreenState extends State<TabScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    SizeConfig().init(context);
+    return widget.needDetails < Duration(seconds:10)
+    ? NewDetailsScreen(widget.user, new UserDetails())
+    : Scaffold(
       body: SafeArea(
         child: _pages[_selectedPage]['page'],
       ),
@@ -47,19 +58,19 @@ class _TabScreenState extends State<TabScreen> {
         currentIndex: _selectedPage,
         selectedItemColor: Theme.of(context).primaryColor,
         unselectedItemColor: Theme.of(context).accentColor,
+        selectedFontSize: 0,
         onTap: _selectPage,
         items: [
           BottomNavigationBarItem(
-            title: SizedBox.shrink(),
+            label: '',
             icon: Icon(
               Icons.dashboard,
             ),
           ),
           BottomNavigationBarItem(
-            title: SizedBox.shrink(),
+            label: '',
             icon: CircleAvatar(
               radius: 15.0,
-              backgroundImage: NetworkImage('http://i.imgur.com/zL4Krbz.jpg'),
             ),
           ),
         ],
