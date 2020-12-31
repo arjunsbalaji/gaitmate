@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "753799164105",
+    "firebase_url": "https://gaitmate.firebaseio.com",
+    "project_id": "gaitmate",
+    "storage_bucket": "gaitmate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753799164105:android:7724029aba106858185d18",
+        "android_client_info": {
+          "package_name": "com.biotech.gaitmate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "753799164105-r9tt8km7oervgsj5l2jr5292gtfha0pn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXFAn9wahOM8aq2PsD3JZ7aFF_vV61gcM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753799164105-r9tt8km7oervgsj5l2jr5292gtfha0pn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

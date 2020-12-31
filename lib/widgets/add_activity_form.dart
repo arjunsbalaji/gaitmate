@@ -1,39 +1,40 @@
 import 'dart:async';
-import 'dart:io';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gaitmate/Services/database.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
-
-import '../providers/collection.dart';
 import '../providers/stopwatch.dart';
 import '../providers/activity.dart';
-import '../providers/acitivty_type_enum.dart';
+import 'package:gaitmate/widgets/leftFootMap.dart';
+import 'package:gaitmate/widgets/rightFootMap.dart';
 
-class AddActvityForm extends StatefulWidget {
+class AddActivityForm extends StatefulWidget {
+  final User user;
+  AddActivityForm(this.user);
+
   @override
-  _AddActvityFormState createState() => _AddActvityFormState();
+  _AddActivityFormState createState() => _AddActivityFormState();
 }
 
-class _AddActvityFormState extends State<AddActvityForm> {
+class _AddActivityFormState extends State<AddActivityForm> {
   final _formKey = GlobalKey<FormState>();
-  ActivityType selectedType = ActivityType.walk;
+  String dropType = 'run';
   final DateFormat formatter = DateFormat('dd-MM-yyyy');
   final notesController = TextEditingController();
 
   Activity _newActivity = Activity(
     id: null,
-    data: {},
+    data: {'painRating': 0, 'confidenceRating': 0},
     notes: '',
     type: 'run',
     startTime: DateTime.now(),
     duration: Duration(seconds: 0),
-    endTime: DateTime.now().add(
-      Duration(seconds: 1),
-    ),
+    endTime: (DateTime.now().add(
+      Duration(seconds: 1))),
     position: null,
   );
 
@@ -46,17 +47,33 @@ class _AddActvityFormState extends State<AddActvityForm> {
   double _painRating = 0;
   double _confidenceRating = 0;
 
+
+
   Future<void> _getPosition() async {
-    Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low)
-        .then((Position position) {
+    var status = await Permission.location.status;
+    print (status);
+    if (status != PermissionStatus.granted) {
+      await Permission.location.request();
+    }
+    if (status == PermissionStatus.granted) {
+      try {
+        await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low)
+            .then((Position position) {
+          setState(() {
+            _position = position;
+          });
+          _getAddress(_position);
+        }).catchError((e) {
+          print(e);
+        });
+      } on Exception catch (_) {}
+    }
+    else {
       setState(() {
-        _position = position;
-        //print(_position.toString());
-        //_newActivity.position = position;
+        _position = Position(latitude: -32.01088385372162, longitude: 115.81459351402168);
       });
-    }).catchError((e) {
-      print(e);
-    });
+    }
+    
   }
 
   void _getAddress(Position position) {
@@ -64,7 +81,7 @@ class _AddActvityFormState extends State<AddActvityForm> {
         .then((List<Placemark> placemark) {
       Placemark place = placemark[0];
       setState(() {
-        print(place.toString());
+        //print(place.toString());
         _currentAddress =
             "${place.locality}"; //, ${place.postalCode}, ${place.country}";
       });
@@ -81,34 +98,12 @@ class _AddActvityFormState extends State<AddActvityForm> {
     );
   }
 
-  Duration strToDuration(String s) {
-    int hours = 0;
-    int minutes = 0;
-    //int seconds = 0;
-    int micros;
-    List<String> parts = s.split(':');
-    if (parts.length > 2) {
-      hours = int.parse(parts[parts.length - 3]);
-    }
-    if (parts.length > 1) {
-      minutes = int.parse(parts[parts.length - 2]);
-    }
-    micros = (double.parse(parts[parts.length - 1]) * 1000000).round();
-    return Duration(hours: hours, minutes: minutes, microseconds: micros);
-  }
-
-  Position strToPosition(String s) {
-    List<String> numbers = s.split(',');
-    double lat = double.parse(s.substring(-1, -13));
-    print(lat.toString());
-  }
-
   void _reset(MyStopwatch swatch) {
     _formKey.currentState.reset();
     swatch.reset();
   }
 
-  Future<void> _submit(BuildContext context, MyStopwatch swatch) async {
+  Future<void> _submit(MyStopwatch swatch) async {
     if (_formKey.currentState.validate()) {
       //IF I AM
       //RECORDING AND GO OFF THE PAGE TIMER ISNT CANCELLED
@@ -121,25 +116,13 @@ class _AddActvityFormState extends State<AddActvityForm> {
       //String notes = notesController.text;
       //Duration elapsedTime = Duration(seconds: swatch.counter);
       //DateTime startTime = DateTime.now();
-      try {
-        await Provider.of<Collection>(context, listen: false)
-            .addActivity(_newActivity);
-      } catch (error) {
-        await showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text(selectedType.toString() + ' Added!'),
-            content: Text('Success!'),
-            //can put actions here
-          ),
-        );
-      }
+      saveActivity(widget.user, _newActivity);
       swatch.reset();
-      setState(
-        () {
-          isLoading = false;
-        },
-      );
+      setState(() {
+        isLoading = false;
+      });
+      FocusScope.of(context).unfocus();
+      Navigator.pop(context, 'added');
     }
   }
 
@@ -150,186 +133,147 @@ class _AddActvityFormState extends State<AddActvityForm> {
 
   @override
   Widget build(BuildContext context) {
-    (_position is Position) ? print('hello') : _getPosition();
-    _getAddress(_position);
-    print(_position.toString());
+    if (_position == null) {_getPosition();}
+    //print(_position.toString());
     MyStopwatch swatch = Provider.of<MyStopwatch>(context);
     return Form(
       key: _formKey,
-      child: SingleChildScrollView(
-        child: Container(
-          //color: Colors.yellow,
-          padding: EdgeInsets.only(
-            left: 10,
-            right: 10,
-            bottom: 10,
-            top: 70,
-          ),
-          child: isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Container(
-                  height: MediaQuery.of(context).size.height * 0.9,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _position != null
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  //color: Colors.red,
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 10, bottom: 20),
-                                  child: Text(
-                                    "You're in $_currentAddress today!",
-                                    style: TextStyle(fontSize: 22),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Container(
-                              child: Text('No Location!'),
-                            ),
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        //color: Colors.lime,
-                        decoration: BoxDecoration(
-                          color: Color(0xFFF3F5F7),
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 6.0,
-                              color: Colors.black26,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: TextFormField(
-                          controller: notesController,
-                          decoration: const InputDecoration(
-                            labelText: 'Notes about your activity...',
+      child: Container(
+        //color: Colors.yellow,
+        padding: EdgeInsets.only(
+          left: 10,
+          right: 10,
+          bottom: 10,
+          top: 70,
+        ),
+        child: isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : SingleChildScrollView(
+                child: Column (
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    _position != null
+                    ? Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(
+                            top:10, left:10, bottom:10
                           ),
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Enter some notes';
+                          child: Text(
+                            "You're in $_currentAddress today!",
+                            style: TextStyle(fontSize:20),
+                          )
+                        )
+                      ],
+                    )
+                    : Container(
+                      child: Text('No Location!'),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        LeftFootMap(),
+                        RightFootMap(),
+                      ],
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      //color: Colors.lime,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF3F5F7),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 6.0,
+                            color: Colors.black26,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: TextFormField(
+                        controller: notesController,
+                        decoration: const InputDecoration(
+                          labelText: 'Notes about your activity ...',
+                        ),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Enter some notes';
+                          }
+                          return null;
+                        },
+                        onSaved: (newValue) {
+                          _newActivity.endTime = DateTime.now();
+                          _newActivity.duration = _newActivity.endTime.difference(_newActivity.startTime);
+                          _newActivity.notes = newValue;
+                          if (_position != null) {_newActivity.position = _position;}
+                          else
+                          {
+                            _newActivity.position = Position(latitude: -32.01088385372162, longitude: 115.81459351402168);
+                          }
+                        },
+                      ),
+                    ),
+                    SizedBox(height:MediaQuery.of(context).size.height*0.05),
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Pain Rating',
+                            style: TextStyle(fontSize:16),
+                            textAlign: TextAlign.start,
+                          ),
+                          Slider(
+                            value:_painRating,
+                            max:10,
+                            min:0,
+                            label: _painRating.toString(),
+                            onChanged: (double value) {
+                              setState(() {
+                                _newActivity.data['painRating'] = value;
+                                _painRating = value;
+                              });
+                            }),
+                      ],),
+                    ),
+                    Container(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Confidence during activity',
+                            style: TextStyle(fontSize: 16),
+                            textAlign: TextAlign.start,
+                          ),
+                          Slider(
+                            value: _confidenceRating,
+                            max: 10,
+                            min: 0,
+                            label: _confidenceRating.toString(),
+                            onChanged: (double value) {
+                              setState(() {
+                                _newActivity.data['confidenceRating'] = 
+                                value;
+                                _confidenceRating = value;
+                              });
                             }
-                            return null;
-                          },
-                          onSaved: (newValue) {
-                            _newActivity.endTime
-                                .difference(_newActivity.startTime)
-                                .toString();
-                            _newActivity = Activity(
-                              notes: newValue,
-                              id: _newActivity.id,
-                              data: _newActivity.data,
-                              duration: _newActivity.endTime
-                                  .difference(_newActivity.startTime),
-                              endTime: _newActivity.endTime,
-                              startTime: _newActivity.startTime,
-                              type: selectedType.toString().split('.')[1],
-                              position: _position,
-                            );
-                          },
+                          )
+                        ],)
+                    ),
+                    Container(
+                      child: Text(
+                        swatch.totalDuration,
+                        style: TextStyle(
+                          fontSize: 50.0,
                         ),
                       ),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.1,
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            Expanded(
-                              child: RadioListTile<ActivityType>(
-                                subtitle: Text('Walk'),
-                                value: ActivityType.walk,
-                                groupValue: selectedType,
-                                onChanged: (ActivityType value) {
-                                  setState(() {
-                                    selectedType = value;
-                                  });
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: RadioListTile<ActivityType>(
-                                subtitle: Text('Run'),
-                                value: ActivityType.run,
-                                groupValue: selectedType,
-                                onChanged: (ActivityType value) {
-                                  setState(() {
-                                    selectedType = value;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        //color: Colors.blue,
-                        child: Column(
-                          children: [
-                            Text(
-                              'Pain Rating',
-                              style: TextStyle(fontSize: 20),
-                              textAlign: TextAlign.start,
-                            ),
-                            Slider(
-                                value: _painRating,
-                                max: 10,
-                                min: 0,
-                                label: _painRating.toString(),
-                                onChanged: (double value) {
-                                  setState(() {
-                                    //print(value);
-                                    _newActivity.data['painRating'] = value;
-                                    _painRating = value;
-                                  });
-                                }),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        //color: Colors.blue,
-                        child: Column(
-                          children: [
-                            Text(
-                              'Confidence during activity',
-                              style: TextStyle(fontSize: 20),
-                              textAlign: TextAlign.start,
-                            ),
-                            Slider(
-                                value: _confidenceRating,
-                                max: 10,
-                                min: 0,
-                                label: _confidenceRating.toString(),
-                                onChanged: (double value) {
-                                  setState(() {
-                                    //print(value);
-                                    //print(_newActivity.data.toString());
-                                    _newActivity.data['confidenceRating'] =
-                                        value;
-                                    _confidenceRating = value;
-                                  });
-                                }),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        child: Text(
-                          swatch.totalDuration,
-                          style: TextStyle(
-                            fontSize: 70.0,
-                          ),
-                        ),
-                      ),
-                      Container(
+                    ),
+                    (!submittable || recording)
+                    ? Container(
                         margin: EdgeInsets.only(top: 10),
-                        height: MediaQuery.of(context).size.height * 0.1,
-                        width: MediaQuery.of(context).size.height * 0.1,
+                        height: MediaQuery.of(context).size.height*0.1,
+                        width: MediaQuery.of(context).size.height*0.1,
                         child: RaisedButton(
                           color: recording
                               ? Colors.redAccent
@@ -337,8 +281,8 @@ class _AddActvityFormState extends State<AddActvityForm> {
                           elevation: 10.0,
                           child: Container(
                             //color: Colors.blue,
-                            width: MediaQuery.of(context).size.height * 0.05,
-                            height: MediaQuery.of(context).size.height * 0.05,
+                            height: MediaQuery.of(context).size.height*0.06,
+                            width: MediaQuery.of(context).size.height*0.06,
                             child: Column(
                               children: [
                                 recording
@@ -350,7 +294,6 @@ class _AddActvityFormState extends State<AddActvityForm> {
                           ),
                           shape: CircleBorder(
                             side: BorderSide(
-
                                 //color: Theme.of(context).primaryColor,
                                 ),
                           ),
@@ -358,41 +301,41 @@ class _AddActvityFormState extends State<AddActvityForm> {
                             _recordChange();
                             recording ? swatch.start() : swatch.pause();
                             submittable = true;
-                            //print(recording);
-                            //print(_position.latitude.toString());
-                            //print(_currentAddress);
-                            //print("recording...");
                           },
                         ),
-                      ),
-                      (submittable && !recording)
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                RaisedButton(
-                                  child: Text('Reset'),
-                                  onPressed: () => _reset(swatch),
-                                ),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.1,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.1,
-                                ),
-                                RaisedButton(
-                                  child: Text('Submit'),
-                                  onPressed: () => _submit(context, swatch),
-                                ),
-                              ],
-                            )
-                          : SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.1,
-                              width: 10,
-                            ),
-                    ],
-                  ),
+                      )
+                    : SizedBox(
+                      height: MediaQuery.of(context).size.height*0.05,
+                      width:10,
+                    ),
+                    (submittable && !recording)
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RaisedButton(
+                                child: Text('Reset'),
+                                onPressed: () {
+                                  submittable = false;
+                                  _reset(swatch);
+                                }
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width*0.1,
+                                height: MediaQuery.of(context).size.height*0.1,
+                              ),
+                              RaisedButton(
+                                child: Text('Submit'),
+                                onPressed: () => _submit(swatch),
+                              ),
+                            ],
+                          )
+                        : SizedBox(
+                            height: MediaQuery.of(context).size.height*0.1,
+                            width: 10,
+                          ),
+                  ],
                 ),
-        ),
+            ),
       ),
     );
   }

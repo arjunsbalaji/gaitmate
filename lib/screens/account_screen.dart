@@ -1,53 +1,94 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gaitmate/providers/details.dart';
+import 'package:gaitmate/providers/auth.dart';
+import 'package:gaitmate/screens/avatar.dart';
+import 'package:gaitmate/providers/userDetails.dart';
+import 'package:gaitmate/Services/database.dart';
 import 'package:provider/provider.dart';
+import 'package:gaitmate/screens/detailsScreen.dart';
+import 'package:gaitmate/helpers/size_config.dart';
 
-import '../providers/auth.dart';
-import '../screens/details_screen.dart';
+class AccountScreen extends StatefulWidget {
+  User user;
+  AccountScreen(this.user);
+  @override
+  _AccountScreenState createState() => _AccountScreenState();
+}
 
-class AccountScreen extends StatelessWidget {
+class _AccountScreenState extends State<AccountScreen> {
+  
+  UserDetails userDetails;
+
+  Future<void> asyncFindUserDetails () async {
+    await findUserDetails(widget.user).then((userDetails) => {
+      this.setState(() {
+        this.userDetails = userDetails;
+      })
+    });
+  }
+  void initState () {
+    super.initState();
+    asyncFindUserDetails();
+  }
   @override
   Widget build(BuildContext context) {
-    /*   Map<String, Object> userProperties =
-        Provider.of<Details>(context, listen: true).userProperties; */
-    return FutureBuilder(
-      future: Provider.of<Details>(
-        context,
-        listen: false,
-      ).fetchAndSetDetails(),
-      builder: (ctx, snapshot) => snapshot.connectionState ==
-              ConnectionState.waiting
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : Consumer<Details>(
-              builder: (ctx, details, ch) => Center(
-                child: Container(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 300),
-                      Text('ACCOUNT SCREEN'),
-                      Text('${details.userProperties['weight']}'),
-                      RaisedButton(
-                        child: Text('Details'),
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushNamed(DetailsScreen.routeName);
-                        },
-                      ),
-                      FlatButton(
-                        child: Text('LOGOUT'),
-                        onPressed: () {
-                          print(
-                              Provider.of<Auth>(context, listen: false).token);
-                          Provider.of<Auth>(context, listen: false).logout();
-                        },
-                      )
-                    ],
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+              ),
+              child: userDetails == null
+              ? Center(child:CircularProgressIndicator())
+              : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Avatar(
+                    avatarUrl: userDetails?.avatarUrl,
+                    onTap: (){},
                   ),
-                ),
+                  SizedBox(height: SizeConfig.blockSizeHorizontal*5),
+                  Text("Hello, ${userDetails?.displayName ?? 'nice to see you'}"),
+                  SizedBox(height: SizeConfig.blockSizeHorizontal*5),
+                  Text('Weight: ${userDetails.weight} kg'),
+                  SizedBox(height: SizeConfig.blockSizeHorizontal*5),
+                  Text('Height: ${userDetails.height} cm'),
+                  SizedBox(height: SizeConfig.blockSizeHorizontal*5),
+                  RaisedButton(
+                    child: Text('Details'),
+                    onPressed: () {
+                      _navigatorAndReload(context);
+                    },
+                  ),
+                  FlatButton(
+                    child: Text('LOGOUT'),
+                    onPressed: () {
+                      context.read<AuthenticationService>().signOut();
+                    },
+                    )
+                ],
               ),
             ),
+          ),
+        ],
+      )
     );
+  }
+  _navigatorAndReload(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailsScreen(
+          widget.user,
+          userDetails,
+        ),
+      ),
+    );
+    setState(() {
+      asyncFindUserDetails();
+    });
   }
 }

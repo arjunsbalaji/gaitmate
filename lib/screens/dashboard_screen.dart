@@ -1,16 +1,38 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gaitmate/screens/add_activity_screen.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:provider/provider.dart';
-import '../widgets/collections_preview.dart';
-import '../providers/collection.dart';
+import 'package:gaitmate/widgets/collections_preview.dart';
+import 'package:gaitmate/Services/database.dart';
 
-class DashboardScreen extends StatelessWidget {
-  static const routeName = '/dashboard';
+class DashboardScreen extends StatefulWidget {
+
+  final User user;
+
+  DashboardScreen(this.user);
+  _DashboardScreenState createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  Duration totalDuration;
+  final activitytypes = ['Runs', 'Walks'];
+  String strTotalDuration;
+
+  void getActivities () {
+    getActivitiesWeek(widget.user, 'all').then((totalDuration) => {
+      this.setState(() {
+        this.totalDuration = totalDuration;
+        this.strTotalDuration = totalDuration.toString().split('.').first.padLeft(8, '0');
+      })
+    });
+  }
+
+  void initState() {
+    super.initState();
+    getActivities();
+  }
+  
   @override
   Widget build(BuildContext context) {
-    final Collection collection = Provider.of<Collection>(context);
-
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Icon(
@@ -18,9 +40,10 @@ class DashboardScreen extends StatelessWidget {
           color: Theme.of(context).primaryColor,
         ),
         onPressed: () {
-          Navigator.of(context).pushNamed(AddActivityScreen.routeName);
+          _navigatorAndReload(context);
         },
       ),
+      
       body: Container(
         padding: EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 10),
         child: Column(
@@ -46,10 +69,8 @@ class DashboardScreen extends StatelessWidget {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) =>
-                      CollectionsPreview(collection.types[index]),
-                  //itemBuilder: (context, index) =>
-                  //    CollectionsPreview(collection[index]),
-                  itemCount: collection.types.length,
+                    CollectionsPreview(activitytypes[index], widget.user),
+                  itemCount: activitytypes.length,
                 ),
               ),
             ),
@@ -64,9 +85,53 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
             ),
+            Center(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                child: Text (
+                  'A journey of a thousand miles begins with a single step - Laozi',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontStyle: FontStyle.italic,
+                    letterSpacing: 1.5,
+                  )
+                )
+              )
+
+            ),
+            Center(
+              child: totalDuration == null
+              ? CircularProgressIndicator()
+              : Container(
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'Total Duration of Activity for this week: $strTotalDuration',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  )
+                )
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+_navigatorAndReload(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddActivityScreen(
+          widget.user,
+        ),
+      ),
+    );
+    if (result == 'added') {
+      setState(() {
+        getActivities();
+      });
+    }
   }
 }

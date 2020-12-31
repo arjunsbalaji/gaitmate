@@ -1,14 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gaitmate/providers/activity.dart';
-import '../providers/collection.dart';
 import '../screens/activities_screen.dart';
-import 'package:provider/provider.dart';
+
+
 
 class CollectionsPreview extends StatelessWidget {
   //final Collection collection;
   final String title;
+  final User user;
 
-  CollectionsPreview(this.title);
+  CollectionsPreview(this.title, this.user);
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +27,7 @@ class CollectionsPreview extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => ActivitiesScreen(
                 title,
+                user,
               ),
             ),
           );
