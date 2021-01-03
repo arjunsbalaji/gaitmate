@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gaitmate/Services/blue.dart';
 import 'package:gaitmate/Services/database.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -33,8 +34,7 @@ class _AddActivityFormState extends State<AddActivityForm> {
     type: 'run',
     startTime: DateTime.now(),
     duration: Duration(seconds: 0),
-    endTime: (DateTime.now().add(
-      Duration(seconds: 1))),
+    endTime: (DateTime.now().add(Duration(seconds: 1))),
     position: null,
   );
 
@@ -47,17 +47,16 @@ class _AddActivityFormState extends State<AddActivityForm> {
   double _painRating = 0;
   double _confidenceRating = 0;
 
-
-
   Future<void> _getPosition() async {
     var status = await Permission.location.status;
-    print (status);
+    print(status);
     if (status != PermissionStatus.granted) {
       await Permission.location.request();
     }
     if (status == PermissionStatus.granted) {
       try {
-        await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low)
+        await Geolocator.getCurrentPosition(
+                desiredAccuracy: LocationAccuracy.low)
             .then((Position position) {
           setState(() {
             _position = position;
@@ -67,13 +66,12 @@ class _AddActivityFormState extends State<AddActivityForm> {
           print(e);
         });
       } on Exception catch (_) {}
-    }
-    else {
+    } else {
       setState(() {
-        _position = Position(latitude: -32.01088385372162, longitude: 115.81459351402168);
+        _position = Position(
+            latitude: -32.01088385372162, longitude: 115.81459351402168);
       });
     }
-    
   }
 
   void _getAddress(Position position) {
@@ -133,7 +131,9 @@ class _AddActivityFormState extends State<AddActivityForm> {
 
   @override
   Widget build(BuildContext context) {
-    if (_position == null) {_getPosition();}
+    if (_position == null) {
+      _getPosition();
+    }
     //print(_position.toString());
     MyStopwatch swatch = Provider.of<MyStopwatch>(context);
     return Form(
@@ -144,34 +144,32 @@ class _AddActivityFormState extends State<AddActivityForm> {
           left: 10,
           right: 10,
           bottom: 10,
-          top: 70,
+          top: 20,
         ),
         child: isLoading
             ? Center(
                 child: CircularProgressIndicator(),
               )
             : SingleChildScrollView(
-                child: Column (
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     _position != null
-                    ? Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(
-                            top:10, left:10, bottom:10
-                          ),
-                          child: Text(
-                            "You're in $_currentAddress today!",
-                            style: TextStyle(fontSize:20),
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                  margin: EdgeInsets.only(
+                                      top: 10, left: 10, bottom: 10),
+                                  child: Text(
+                                    "You're in $_currentAddress today!",
+                                    style: TextStyle(fontSize: 20),
+                                  ))
+                            ],
                           )
-                        )
-                      ],
-                    )
-                    : Container(
-                      child: Text('No Location!'),
-                    ),
+                        : Container(
+                            child: Text('No Location!'),
+                          ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -206,61 +204,63 @@ class _AddActivityFormState extends State<AddActivityForm> {
                         },
                         onSaved: (newValue) {
                           _newActivity.endTime = DateTime.now();
-                          _newActivity.duration = _newActivity.endTime.difference(_newActivity.startTime);
+                          _newActivity.duration = _newActivity.endTime
+                              .difference(_newActivity.startTime);
                           _newActivity.notes = newValue;
-                          if (_position != null) {_newActivity.position = _position;}
-                          else
-                          {
-                            _newActivity.position = Position(latitude: -32.01088385372162, longitude: 115.81459351402168);
+                          if (_position != null) {
+                            _newActivity.position = _position;
+                          } else {
+                            _newActivity.position = Position(
+                                latitude: -32.01088385372162,
+                                longitude: 115.81459351402168);
                           }
                         },
                       ),
                     ),
-                    SizedBox(height:MediaQuery.of(context).size.height*0.05),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                     Container(
                       child: Column(
                         children: [
                           Text(
                             'Pain Rating',
-                            style: TextStyle(fontSize:16),
-                            textAlign: TextAlign.start,
-                          ),
-                          Slider(
-                            value:_painRating,
-                            max:10,
-                            min:0,
-                            label: _painRating.toString(),
-                            onChanged: (double value) {
-                              setState(() {
-                                _newActivity.data['painRating'] = value;
-                                _painRating = value;
-                              });
-                            }),
-                      ],),
-                    ),
-                    Container(
-                      child: Column(
-                        children: [
-                          Text(
-                            'Confidence during activity',
                             style: TextStyle(fontSize: 16),
                             textAlign: TextAlign.start,
                           ),
                           Slider(
+                              value: _painRating,
+                              max: 10,
+                              min: 0,
+                              label: _painRating.toString(),
+                              onChanged: (double value) {
+                                setState(() {
+                                  _newActivity.data['painRating'] = value;
+                                  _painRating = value;
+                                });
+                              }),
+                        ],
+                      ),
+                    ),
+                    Container(
+                        child: Column(
+                      children: [
+                        Text(
+                          'Confidence during activity',
+                          style: TextStyle(fontSize: 16),
+                          textAlign: TextAlign.start,
+                        ),
+                        Slider(
                             value: _confidenceRating,
                             max: 10,
                             min: 0,
                             label: _confidenceRating.toString(),
                             onChanged: (double value) {
                               setState(() {
-                                _newActivity.data['confidenceRating'] = 
-                                value;
+                                _newActivity.data['confidenceRating'] = value;
                                 _confidenceRating = value;
                               });
-                            }
-                          )
-                        ],)
-                    ),
+                            })
+                      ],
+                    )),
                     Container(
                       child: Text(
                         swatch.totalDuration,
@@ -270,58 +270,60 @@ class _AddActivityFormState extends State<AddActivityForm> {
                       ),
                     ),
                     (!submittable || recording)
-                    ? Container(
-                        margin: EdgeInsets.only(top: 10),
-                        height: MediaQuery.of(context).size.height*0.1,
-                        width: MediaQuery.of(context).size.height*0.1,
-                        child: RaisedButton(
-                          color: recording
-                              ? Colors.redAccent
-                              : Theme.of(context).primaryColor,
-                          elevation: 10.0,
-                          child: Container(
-                            //color: Colors.blue,
-                            height: MediaQuery.of(context).size.height*0.06,
-                            width: MediaQuery.of(context).size.height*0.06,
-                            child: Column(
-                              children: [
-                                recording
-                                    ? Icon(Icons.stop)
-                                    : Icon(Icons.play_arrow),
-                                recording ? Text('Stop') : Text('Start'),
-                              ],
-                            ),
-                          ),
-                          shape: CircleBorder(
-                            side: BorderSide(
-                                //color: Theme.of(context).primaryColor,
+                        ? Container(
+                            margin: EdgeInsets.only(top: 10),
+                            height: MediaQuery.of(context).size.height * 0.1,
+                            width: MediaQuery.of(context).size.height * 0.1,
+                            child: RaisedButton(
+                              color: recording
+                                  ? Colors.redAccent
+                                  : Theme.of(context).primaryColor,
+                              elevation: 10.0,
+                              child: Container(
+                                //color: Colors.blue,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.06,
+                                width:
+                                    MediaQuery.of(context).size.height * 0.06,
+                                child: Column(
+                                  children: [
+                                    recording
+                                        ? Icon(Icons.stop)
+                                        : Icon(Icons.play_arrow),
+                                    recording ? Text('Stop') : Text('Start'),
+                                  ],
                                 ),
+                              ),
+                              shape: CircleBorder(
+                                side: BorderSide(
+                                    //color: Theme.of(context).primaryColor,
+                                    ),
+                              ),
+                              onPressed: () {
+                                _recordChange();
+                                recording ? swatch.start() : swatch.pause();
+                                submittable = true;
+                              },
+                            ),
+                          )
+                        : SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            width: 10,
                           ),
-                          onPressed: () {
-                            _recordChange();
-                            recording ? swatch.start() : swatch.pause();
-                            submittable = true;
-                          },
-                        ),
-                      )
-                    : SizedBox(
-                      height: MediaQuery.of(context).size.height*0.05,
-                      width:10,
-                    ),
                     (submittable && !recording)
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               RaisedButton(
-                                child: Text('Reset'),
-                                onPressed: () {
-                                  submittable = false;
-                                  _reset(swatch);
-                                }
-                              ),
+                                  child: Text('Reset'),
+                                  onPressed: () {
+                                    submittable = false;
+                                    _reset(swatch);
+                                  }),
                               SizedBox(
-                                width: MediaQuery.of(context).size.width*0.1,
-                                height: MediaQuery.of(context).size.height*0.1,
+                                width: MediaQuery.of(context).size.width * 0.1,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.1,
                               ),
                               RaisedButton(
                                 child: Text('Submit'),
@@ -330,12 +332,12 @@ class _AddActivityFormState extends State<AddActivityForm> {
                             ],
                           )
                         : SizedBox(
-                            height: MediaQuery.of(context).size.height*0.1,
+                            height: MediaQuery.of(context).size.height * 0.1,
                             width: 10,
                           ),
                   ],
                 ),
-            ),
+              ),
       ),
     );
   }

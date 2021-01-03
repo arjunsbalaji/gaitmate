@@ -2,8 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../screens/activities_screen.dart';
 
-
-
 class CollectionsPreview extends StatelessWidget {
   //final Collection collection;
   final String title;
