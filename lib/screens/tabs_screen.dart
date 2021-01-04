@@ -23,8 +23,6 @@ class _TabScreenState extends State<TabScreen> {
   List<Map<String, Object>> _pages;
   int _selectedPage = 0;
 
-  //TEMPBLUETOOTH UUID
-
   @override
   void initState() {
     _pages = [
@@ -41,48 +39,12 @@ class _TabScreenState extends State<TabScreen> {
     super.initState();
   }
 
-/*   @override
-  void didChangeDependencies() async {
-    try {
-      bool available = await flutterBlue.isAvailable;
-      bool isOn = await flutterBlue.isOn;
-      isOn && available ? print('On and Available') : print('Not On');
-    } on Exception catch (e) {
-      print(e);
-    }
-    super.didChangeDependencies();
-  } */
-
   void _selectPage(int index) {
     setState(() {
       //print(index);
       _selectedPage = index;
     });
   }
-
-/*   Future<void> getServices(device) async {
-    List<BluetoothService> services = await device.discoverServices();
-    print('SERVICES LENGTH ${services.length}');
-    BluetoothService service = services
-        .firstWhere((service) => service.uuid.toString() == _service_UUID);
-    print('SERVICE ${service.uuid.toString()}');
-    BluetoothCharacteristic char =
-        service.characteristics.firstWhere((c) => c.properties.notify == true);
-    print(char.properties.toString());
-    printChar(char);
-  }
-
-  Future<void> printChar(BluetoothCharacteristic characteristic) async {
-    await characteristic.setNotifyValue(true);
-    StreamSubscription charStream = characteristic.value.listen(
-      (value) {
-        print(value.toString());
-      },
-    );
-    charStream.onError((e) => print(e));
-  }
-
-  FlutterBlue flutterBlue = FlutterBlue.instance; */
 
   @override
   Widget build(BuildContext context) {

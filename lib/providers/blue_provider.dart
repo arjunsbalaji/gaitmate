@@ -1,32 +1,37 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import '../Services/blue.dart';
 
-class Blue {
+class BlueProvider with ChangeNotifier {
   FlutterBlue fBlue = FlutterBlue.instance;
   BluetoothDevice device;
   BluetoothCharacteristic characteristic;
 
   bool connected = false;
+  bool isOn = false;
+  bool isAvailable = false;
+
+  BlueProvider();
 
   List<List<int>> sensorData = [];
-
-  Blue();
 
   static const String _serviceUUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
   static const DeviceIdentifier deviceIdentifier =
       DeviceIdentifier('AC:67:B2:46:81:72');
 
   Future<bool> checkBluetoothStatus() async {
-    bool isOn = await fBlue.isOn;
-    bool isAvailable = await fBlue.isAvailable;
+    isOn = await fBlue.isOn;
+    isAvailable = await fBlue.isAvailable;
+    notifyListeners();
     isOn ? print('On') : print('Not On');
     isAvailable ? print('Available') : print('Not available');
     return (isOn && isAvailable) ? true : false;
   }
 
   void connectDevice() async {
-    fBlue.startScan(timeout: Duration(seconds: 4));
+    fBlue.startScan(timeout: Duration(seconds: 2));
 
     var subscription = fBlue.scanResults.listen(
       (results) {
@@ -38,6 +43,7 @@ class Blue {
             print(
                 'INSIDE CONNECT DEVICE DEVICE ID IS: ${device.id.toString()}');
             connected = true;
+            notifyListeners();
           }
         }
       },
@@ -45,6 +51,8 @@ class Blue {
     if (connected != true) {
       print('BLUETOOTH GAITMATE DEVICE NOT CONECTED, TRY TURNING IT ON');
     }
+    await fBlue.stopScan();
+
     //List<BluetoothDevice> cd = await fBlue.connectedDevices;
     //print('CONNECTED DEVICES LIST: ${cd.toString()}');
   }
@@ -75,9 +83,10 @@ class Blue {
     });
   }
 
-  void dispose() {
+  void empty() {
     this.device.disconnect();
     sensorData = [];
     connected = false;
+    notifyListeners();
   }
 }

@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gaitmate/providers/blue_provider.dart';
 import 'package:gaitmate/screens/add_activity_screen.dart';
 import 'package:gaitmate/widgets/collections_preview.dart';
 import 'package:gaitmate/Services/database.dart';
+import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
-
   final User user;
 
   DashboardScreen(this.user);
@@ -17,20 +18,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final activitytypes = ['Runs', 'Walks'];
   String strTotalDuration;
 
-  void getActivities () {
+  void getActivities() {
     getActivitiesWeek(widget.user, 'all').then((totalDuration) => {
-      this.setState(() {
-        this.totalDuration = totalDuration;
-        this.strTotalDuration = totalDuration.toString().split('.').first.padLeft(8, '0');
-      })
-    });
+          this.setState(() {
+            this.totalDuration = totalDuration;
+            this.strTotalDuration =
+                totalDuration.toString().split('.').first.padLeft(8, '0');
+          })
+        });
   }
 
   void initState() {
     super.initState();
     getActivities();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +45,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _navigatorAndReload(context);
         },
       ),
-      
       body: Container(
         padding: EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 10),
         child: Column(
@@ -69,7 +70,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) =>
-                    CollectionsPreview(activitytypes[index], widget.user),
+                      CollectionsPreview(activitytypes[index], widget.user),
                   itemCount: activitytypes.length,
                 ),
               ),
@@ -86,40 +87,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             Center(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Text (
-                  'A journey of a thousand miles begins with a single step - Laozi',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontStyle: FontStyle.italic,
-                    letterSpacing: 1.5,
-                  )
-                )
-              )
-
-            ),
+                child: Container(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                        'A journey of a thousand miles begins with a single step - Laozi',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontStyle: FontStyle.italic,
+                          letterSpacing: 1.5,
+                        )))),
             Center(
               child: totalDuration == null
-              ? CircularProgressIndicator()
-              : Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Total Duration of Activity for this week: $strTotalDuration',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
-                  )
-                )
-              ),
+                  ? CircularProgressIndicator()
+                  : Container(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                          'Total Duration of Activity for this week: $strTotalDuration',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                          ))),
             ),
           ],
         ),
       ),
     );
   }
-_navigatorAndReload(BuildContext context) async {
+
+  _navigatorAndReload(BuildContext context) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
