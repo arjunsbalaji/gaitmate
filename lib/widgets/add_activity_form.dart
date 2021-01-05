@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gaitmate/Services/blue.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:gaitmate/Services/database.dart';
+import 'package:gaitmate/providers/blue_provider.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -101,6 +103,11 @@ class _AddActivityFormState extends State<AddActivityForm> {
     swatch.reset();
   }
 
+  /*  void sensorData(BlueProvider blue) async {
+    blue.getCharacteristic();
+    blue.listenSensorData();
+  } */
+
   Future<void> _submit(MyStopwatch swatch) async {
     if (_formKey.currentState.validate()) {
       //IF I AM
@@ -112,8 +119,9 @@ class _AddActivityFormState extends State<AddActivityForm> {
       });
       _formKey.currentState.save();
       //String notes = notesController.text;
-      //Duration elapsedTime = Duration(seconds: swatch.counter);
+      Duration elapsedTime = Duration(seconds: swatch.counter);
       //DateTime startTime = DateTime.now();
+      _newActivity.duration = elapsedTime;
       saveActivity(widget.user, _newActivity);
       swatch.reset();
       setState(() {
@@ -134,8 +142,19 @@ class _AddActivityFormState extends State<AddActivityForm> {
     if (_position == null) {
       _getPosition();
     }
-    //print(_position.toString());
+
+    BlueProvider blue = Provider.of<BlueProvider>(context, listen: true);
+
     MyStopwatch swatch = Provider.of<MyStopwatch>(context);
+
+    //blue.updateBluetoothStatus();
+    //blue.getCharacteristic();
+    //print('CHAR ' + blue.characteristic.toString());
+    //print('DEVICE' + blue.device.toString());
+    //print(blue.status.toString());
+
+    blue.connectDevice();
+
     return Form(
       key: _formKey,
       child: Container(
@@ -159,12 +178,75 @@ class _AddActivityFormState extends State<AddActivityForm> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Container(
-                                  margin: EdgeInsets.only(
-                                      top: 10, left: 10, bottom: 10),
-                                  child: Text(
-                                    "You're in $_currentAddress today!",
-                                    style: TextStyle(fontSize: 20),
-                                  ))
+                                margin: EdgeInsets.only(
+                                    top: 30, left: 10, bottom: 10),
+                                child: Text(
+                                  "You're in $_currentAddress today!",
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              ),
+                              Expanded(
+                                child: IconButton(
+                                  icon: Icon(Icons.bluetooth),
+                                  onPressed: () {
+                                    showDialog<void>(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text('Bluetooth Status'),
+                                          content: StreamBuilder<
+                                              BluetoothDeviceState>(
+                                            stream: blue.device.state,
+                                            builder: (context, snapshot) {
+                                              if (snapshot.data ==
+                                                  BluetoothDeviceState
+                                                      .connected) {
+                                                //put switch case here for on, available, scanning, connected lights
+                                                return Container(
+                                                    color: Colors.green,
+                                                    height: 20,
+                                                    width: 20);
+                                              } else {
+                                                return Container(
+                                                    color: Colors.red,
+                                                    height: 20,
+                                                    width: 20);
+                                              }
+                                            },
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text('Scan and Connect'),
+                                              onPressed: () {
+                                                blue.connectDevice();
+                                                print(
+                                                    blue.connected.toString());
+                                                print(blue.device.toString());
+                                              },
+                                            ),
+                                            TextButton(
+                                              child: Text('Disconnect'),
+                                              onPressed: () {
+                                                blue.empty();
+                                                print(
+                                                    blue.device.id.toString());
+                                                print(blue.status.toString());
+                                              },
+                                            ),
+                                            TextButton(
+                                              child: Text('Dismiss'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
                             ],
                           )
                         : Container(

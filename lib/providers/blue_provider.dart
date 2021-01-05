@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import '../Services/blue.dart';
+
+enum BTStatus { unavailable, off, scanning, connected, disconnected }
 
 class BlueProvider with ChangeNotifier {
   FlutterBlue fBlue = FlutterBlue.instance;
@@ -12,6 +13,21 @@ class BlueProvider with ChangeNotifier {
   bool connected = false;
   bool isOn = false;
   bool isAvailable = false;
+  bool scanning = false;
+
+  BTStatus _status = BTStatus.unavailable;
+
+  BTStatus get status {
+    return _status;
+  }
+
+  Stream<BluetoothDeviceState> get deviceState {
+    if (device != null) {
+      return device.state;
+    } else {
+      throw Exception('no device');
+    }
+  }
 
   BlueProvider();
 
@@ -21,40 +37,70 @@ class BlueProvider with ChangeNotifier {
   static const DeviceIdentifier deviceIdentifier =
       DeviceIdentifier('AC:67:B2:46:81:72');
 
-  Future<bool> checkBluetoothStatus() async {
-    isOn = await fBlue.isOn;
-    isAvailable = await fBlue.isAvailable;
-    notifyListeners();
-    isOn ? print('On') : print('Not On');
-    isAvailable ? print('Available') : print('Not available');
-    return (isOn && isAvailable) ? true : false;
+  Future<void> updateBluetoothStatus() async {
+    try {
+      device = null;
+      isOn = await fBlue.isOn;
+      isAvailable = await fBlue.isAvailable;
+      bool connected =
+          await fBlue.connectedDevices.then((value) => value.length == 1);
+      //bool connected = (device != null) ? true : false;
+      //can write a little check func here that tests getting listen
+      if (connected) {
+        fBlue.connectedDevices.then(
+          (value) {
+            device = value[0];
+            _status = BTStatus.connected;
+            notifyListeners();
+          },
+        );
+      } else {
+        print('Device not already connected, trying to connect now!');
+        connectDevice();
+      }
+      //int status = [isAvailable, isOn, connected]
+      //    .lastIndexWhere((element) => element == true);
+      //_status = BTStatus.values[status];
+      //notifyListeners();
+      //print(connected.toString());
+      print('INSIDE UPDATE BT ' + device.toString());
+    } catch (e) {
+      print(e);
+    }
   }
 
-  void connectDevice() async {
-    fBlue.startScan(timeout: Duration(seconds: 2));
+  void connectDevice() {
+    _status = BTStatus.scanning;
+    notifyListeners();
+    try {
+      fBlue.startScan(timeout: Duration(seconds: 2));
 
-    var subscription = fBlue.scanResults.listen(
-      (results) {
-        for (ScanResult r in results) {
-          //print(r.device.id);
-          if (r.device.id == deviceIdentifier) {
-            device = r.device;
+      //add if already connected then just pass done change state to scanning
+
+      fBlue.scanResults.listen(
+        (results) {
+          print(results.toString());
+          ScanResult correctResult = results
+              .where((element) => element.device.id == deviceIdentifier)
+              .toList()[0];
+          device = correctResult.device;
+          if (device == null) {
+            _status = BTStatus.off;
+            throw Exception(
+                'Device not found, make sure to turn on BT and the device.');
+          } else {
             device.connect();
-            print(
-                'INSIDE CONNECT DEVICE DEVICE ID IS: ${device.id.toString()}');
-            connected = true;
+            _status = BTStatus.connected;
             notifyListeners();
           }
-        }
-      },
-    );
-    if (connected != true) {
-      print('BLUETOOTH GAITMATE DEVICE NOT CONECTED, TRY TURNING IT ON');
+        },
+      );
+    } catch (e) {
+      print(e);
+    } finally {
+      fBlue.stopScan();
     }
-    await fBlue.stopScan();
-
-    //List<BluetoothDevice> cd = await fBlue.connectedDevices;
-    //print('CONNECTED DEVICES LIST: ${cd.toString()}');
+    print('INSIDE CONNECT DEVICE ${(device != null)}');
   }
 
   void getCharacteristic() async {
@@ -70,23 +116,29 @@ class BlueProvider with ChangeNotifier {
     //print(' CHAR PROPS ${characteristic.properties.toString()}');
   }
 
-  void listenCharacteristic() async {
+/*   Future<StreamSubscription> listenSensorData() async {
     await characteristic.setNotifyValue(true);
-    characteristic.value.map((event) => utf8.decode(event)).listen((event) {
+    streamSubscription =
+        characteristic.value.map((event) => utf8.decode(event)).listen((event) {
       List<int> cleaned_event = event
           .substring(0, event.length - 1)
           .split(',')
           .map((e) => int.parse(e))
           .toList();
-      sensorData.add(cleaned_event);
+      return streamSubscription;
+      //sensorData.add(cleaned_event);
       //print(cleaned_event.toString());
     });
   }
-
+ */
   void empty() {
-    this.device.disconnect();
+    if (device != null) {
+      device.disconnect();
+      device = null;
+    }
     sensorData = [];
-    connected = false;
+    _status = BTStatus.off;
+
     notifyListeners();
   }
 }

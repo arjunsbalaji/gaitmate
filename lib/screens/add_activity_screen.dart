@@ -5,7 +5,7 @@ import 'package:gaitmate/providers/blue_provider.dart';
 import 'package:provider/provider.dart';
 import '../widgets/add_activity_form.dart';
 import 'package:gaitmate/providers/stopwatch.dart';
-import '../Services/blue.dart';
+//import '../Services/blue.dart';
 
 class AddActivityScreen extends StatefulWidget {
   final User user;
@@ -16,7 +16,7 @@ class AddActivityScreen extends StatefulWidget {
 }
 
 class _AddActivityScreenState extends State<AddActivityScreen> {
-  Blue fBlue = Blue();
+  //Blue fBlue = Blue();
 
   @override
   void didChangeDependencies() async {
@@ -34,9 +34,9 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
     super.dispose();
   }
 
-  Future<void> _showBTStatusAlertDialog() async {
-    bool status = await fBlue.checkBluetoothStatus();
-    return status
+  Future<void> _showBTStatusAlertDialog(BTStatus status) async {
+    //bool status = await fBlue.checkBluetoothStatus();
+    return status == BTStatus.off || status == BTStatus.unavailable
         ? null
         : showDialog(
             context: context,
@@ -58,44 +58,50 @@ class _AddActivityScreenState extends State<AddActivityScreen> {
           );
   }
 
-  Widget showBTStatusButton() {
+  Widget showBTStatusButton(BTStatus status) {
+    List<Color> colors = [
+      Colors.black26,
+      Colors.grey,
+      Colors.amber,
+      Colors.green,
+      Colors.red
+    ];
+    List<String> msgs = [
+      'unavailable',
+      'off',
+      'scanning',
+      'connected',
+      'disconnected'
+    ];
+
     return RaisedButton.icon(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15), side: BorderSide.none),
-      color: fBlue.connected ? Colors.green : Colors.red,
+      color: colors[status.index],
       onPressed: () {},
       icon: Icon(Icons.bluetooth),
-      label: Text('BlueTooth'),
+      label: Text(msgs[status.index]),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    //Future<bool> status =
-    //    Provider.of<BlueProvider>(context).checkBluetoothStatus();
     //bool status = true;
-    _showBTStatusAlertDialog();
-
+    //_showBTStatusAlertDialog();
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => MyStopwatch(),
-          ),
-        ],
-        child: Scaffold(
-          appBar: AppBar(
-            actions: [
-              showBTStatusButton(),
-              IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {
-                  fBlue.connectDevice();
-                  fBlue.getCharacteristic();
-                },
-              ),
-            ],
-          ),
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => MyStopwatch(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => BlueProvider(),
+        ),
+      ],
+      builder: (context, child) {
+        return Scaffold(
           body: AddActivityForm(widget.user),
-        ));
+        );
+      },
+    );
   }
 }

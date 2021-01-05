@@ -87,27 +87,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             Center(
-                child: Container(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                        'A journey of a thousand miles begins with a single step - Laozi',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontStyle: FontStyle.italic,
-                          letterSpacing: 1.5,
-                        )))),
+              child: Container(
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'A journey of a thousand miles begins with a single step - Laozi',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontStyle: FontStyle.italic,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ),
+            ),
             Center(
               child: totalDuration == null
                   ? CircularProgressIndicator()
                   : Container(
                       padding: EdgeInsets.all(10),
                       child: Text(
-                          'Total Duration of Activity for this week: $strTotalDuration',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5,
-                          ))),
+                        'Total Duration of Activity for this week: $strTotalDuration',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),
