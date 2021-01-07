@@ -25,7 +25,9 @@ class BlueProvider with ChangeNotifier {
     if (device != null) {
       return device.state;
     } else {
-      throw Exception('no device');
+      return Stream.periodic(Duration(seconds: 10), (_) {
+        return BluetoothDeviceState.disconnected;
+      });
     }
   }
 
@@ -39,7 +41,7 @@ class BlueProvider with ChangeNotifier {
 
   Future<void> updateBluetoothStatus() async {
     try {
-      device = null;
+      //device = null;
       isOn = await fBlue.isOn;
       isAvailable = await fBlue.isAvailable;
       bool connected =
@@ -69,29 +71,31 @@ class BlueProvider with ChangeNotifier {
     }
   }
 
-  void connectDevice() {
-    _status = BTStatus.scanning;
-    notifyListeners();
+  Future<void> connectDevice() async {
+    /* _status = BTStatus.scanning;
+    notifyListeners(); */
     try {
-      fBlue.startScan(timeout: Duration(seconds: 2));
+      await fBlue.startScan(timeout: Duration(seconds: 5));
 
       //add if already connected then just pass done change state to scanning
 
-      fBlue.scanResults.listen(
-        (results) {
+      await fBlue.scanResults.listen(
+        (results) async {
           print(results.toString());
           ScanResult correctResult = results
               .where((element) => element.device.id == deviceIdentifier)
               .toList()[0];
           device = correctResult.device;
           if (device == null) {
-            _status = BTStatus.off;
+            print('preexcept');
+            //_status = BTStatus.off;
             throw Exception(
                 'Device not found, make sure to turn on BT and the device.');
           } else {
-            device.connect();
-            _status = BTStatus.connected;
-            notifyListeners();
+            await device.connect();
+            print('else');
+            //_status = BTStatus.connected;
+            //notifyListeners();
           }
         },
       );
@@ -99,6 +103,7 @@ class BlueProvider with ChangeNotifier {
       print(e);
     } finally {
       fBlue.stopScan();
+      print('INSIDE CONNECT DEVICE ${(device != null)}');
     }
     print('INSIDE CONNECT DEVICE ${(device != null)}');
   }
@@ -116,26 +121,46 @@ class BlueProvider with ChangeNotifier {
     //print(' CHAR PROPS ${characteristic.properties.toString()}');
   }
 
-/*   Future<StreamSubscription> listenSensorData() async {
-    await characteristic.setNotifyValue(true);
-    streamSubscription =
-        characteristic.value.map((event) => utf8.decode(event)).listen((event) {
+  Stream<List<int>> getSensorDataStream() {
+    return characteristic.value.map((event) => utf8.decode(event)).map(
+        (event) => event
+            .substring(0, event.length - 1)
+            .split(',')
+            .map((e) => int.parse(e))
+            .toList());
+    /*    .listen((event) {
       List<int> cleaned_event = event
           .substring(0, event.length - 1)
           .split(',')
           .map((e) => int.parse(e))
-          .toList();
-      return streamSubscription;
-      //sensorData.add(cleaned_event);
-      //print(cleaned_event.toString());
-    });
+          .toList(); */
+    //sensorData.add(cleaned_event);
+    //print(cleaned_event.toString());
   }
- */
+
+  /*  Future<Stream<List<int>>> getSensorDataStream() async {
+    await characteristic.setNotifyValue(true);
+    return characteristic.value.map((event) => utf8.decode(event)).map(
+        (event) => event
+            .substring(0, event.length - 1)
+            .split(',')
+            .map((e) => int.parse(e))
+            .toList());
+    /*    .listen((event) {
+      List<int> cleaned_event = event
+          .substring(0, event.length - 1)
+          .split(',')
+          .map((e) => int.parse(e))
+          .toList(); */
+    //sensorData.add(cleaned_event);
+    //print(cleaned_event.toString());
+  } */
+
   void empty() {
-    if (device != null) {
-      device.disconnect();
-      device = null;
-    }
+    /* if (device != null) {
+      //device.disconnect();
+      //device = null;
+    } */
     sensorData = [];
     _status = BTStatus.off;
 

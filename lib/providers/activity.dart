@@ -7,22 +7,23 @@ class Activity with ChangeNotifier {
   DatabaseReference id;
   String notes;
   String type;
+  List<List<int>> sensorData;
   Map<String, Object> data;
   DateTime startTime;
   Duration duration;
   DateTime endTime;
   Position position;
 
-  Activity({
-    this.id,
-    this.data,
-    this.notes,
-    this.type,
-    this.startTime,
-    this.duration,
-    this.endTime,
-    this.position
-  });
+  Activity(
+      {this.id,
+      this.data,
+      this.notes,
+      this.type,
+      this.sensorData,
+      this.startTime,
+      this.duration,
+      this.endTime,
+      this.position});
 
   void setID(DatabaseReference id) {
     this.id = id;
@@ -32,6 +33,7 @@ class Activity with ChangeNotifier {
     return {
       'painRating': this.data['painRating'],
       'confidenceRating': this.data['confidenceRating'],
+      'sensorData': this.sensorData,
       'notes': this.notes,
       'duration': this.duration.toString(),
       'startTime': this.startTime.toString(),
@@ -45,9 +47,10 @@ class Activity with ChangeNotifier {
 
 Activity createActivity(record) {
   Map<String, dynamic> attributes = {
-    'data': {'painRating': 0, 'confidenceRating':0},
+    'data': {'painRating': 0, 'confidenceRating': 0},
     'notes': '',
     'duration': null,
+    'sensorData': [],
     'startTime': null,
     'endTime': null,
     'type': '',
@@ -57,8 +60,12 @@ Activity createActivity(record) {
   record.forEach((key, value) => {attributes[key] = value});
 
   Activity activity = new Activity(
-    data: {'painRating': attributes['painRating'], 'confidenceRating':attributes['confidenceRating']},
+    data: {
+      'painRating': attributes['painRating'],
+      'confidenceRating': attributes['confidenceRating']
+    },
     notes: attributes['notes'],
+    sensorData: attributes['sensorData'],
     type: attributes['type'],
     startTime: DateTime.parse(attributes['startTime']),
     endTime: DateTime.parse(attributes['endTime']),

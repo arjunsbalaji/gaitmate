@@ -31,6 +31,7 @@ class _AddActivityFormState extends State<AddActivityForm> {
 
   Activity _newActivity = Activity(
     id: null,
+    sensorData: [],
     data: {'painRating': 0, 'confidenceRating': 0},
     notes: '',
     type: 'run',
@@ -40,6 +41,7 @@ class _AddActivityFormState extends State<AddActivityForm> {
     position: null,
   );
 
+  List<List<int>> sensorData = [];
   bool recording = false;
   bool submittable = false;
   bool isLoading = false;
@@ -48,6 +50,9 @@ class _AddActivityFormState extends State<AddActivityForm> {
   String _currentAddress;
   double _painRating = 0;
   double _confidenceRating = 0;
+
+  final StreamController<List<int>> streamController = StreamController();
+  StreamSubscription streamSubscription;
 
   Future<void> _getPosition() async {
     var status = await Permission.location.status;
@@ -108,7 +113,7 @@ class _AddActivityFormState extends State<AddActivityForm> {
     blue.listenSensorData();
   } */
 
-  Future<void> _submit(MyStopwatch swatch) async {
+  Future<void> _submit(MyStopwatch swatch, List<List<int>> sensorData) async {
     if (_formKey.currentState.validate()) {
       //IF I AM
       //RECORDING AND GO OFF THE PAGE TIMER ISNT CANCELLED
@@ -122,6 +127,7 @@ class _AddActivityFormState extends State<AddActivityForm> {
       Duration elapsedTime = Duration(seconds: swatch.counter);
       //DateTime startTime = DateTime.now();
       _newActivity.duration = elapsedTime;
+      _newActivity.sensorData = sensorData;
       saveActivity(widget.user, _newActivity);
       swatch.reset();
       setState(() {
@@ -153,273 +159,381 @@ class _AddActivityFormState extends State<AddActivityForm> {
     //print('DEVICE' + blue.device.toString());
     //print(blue.status.toString());
 
-    blue.connectDevice();
+    if (blue.device == null) {
+      blue.connectDevice();
+    }
+    //if (device !){streamController.addStream(blue.getSensorDataStream());}
 
-    return Form(
-      key: _formKey,
-      child: Container(
-        //color: Colors.yellow,
-        padding: EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-          top: 20,
-        ),
-        child: isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    _position != null
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: 30, left: 10, bottom: 10),
-                                child: Text(
-                                  "You're in $_currentAddress today!",
-                                  style: TextStyle(fontSize: 20),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add an Activity '),
+      ),
+      body: Form(
+        key: _formKey,
+        child: Container(
+          //color: Colors.yellow,
+          padding: EdgeInsets.only(
+            left: 10,
+            right: 10,
+            bottom: 10,
+            top: 20,
+          ),
+          child: isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      _position != null
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      top: 30, left: 10, bottom: 10),
+                                  child: Text(
+                                    "You're in $_currentAddress today!",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
                                 ),
-                              ),
-                              Expanded(
-                                child: IconButton(
-                                  icon: Icon(Icons.bluetooth),
-                                  onPressed: () {
-                                    showDialog<void>(
-                                      context: context,
-                                      barrierDismissible: false,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          title: Text('Bluetooth Status'),
-                                          content: StreamBuilder<
-                                              BluetoothDeviceState>(
-                                            stream: blue.device.state,
-                                            builder: (context, snapshot) {
-                                              if (snapshot.data ==
-                                                  BluetoothDeviceState
-                                                      .connected) {
-                                                //put switch case here for on, available, scanning, connected lights
-                                                return Container(
-                                                    color: Colors.green,
-                                                    height: 20,
-                                                    width: 20);
-                                              } else {
-                                                return Container(
-                                                    color: Colors.red,
-                                                    height: 20,
-                                                    width: 20);
-                                              }
-                                            },
-                                          ),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              child: Text('Scan and Connect'),
-                                              onPressed: () {
-                                                blue.connectDevice();
-                                                print(
-                                                    blue.connected.toString());
-                                                print(blue.device.toString());
-                                              },
+                                Expanded(
+                                  child: IconButton(
+                                    icon: Icon(Icons.bluetooth),
+                                    onPressed: () {
+                                      showDialog<void>(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text('Bluetooth Status'),
+                                            content: Container(
+                                              child: StreamBuilder<
+                                                  BluetoothDeviceState>(
+                                                stream: blue.deviceState,
+                                                builder: (context, snapshot) {
+                                                  /* if (snapshot.data ==
+                                                      BluetoothDeviceState
+                                                          .connected) {
+                                                    //put switch case here for on, available, scanning, connected lights
+                                                    return Container(
+                                                        color: Colors.green,
+                                                        height: 20,
+                                                        width: 20);
+                                                  } else {
+                                                    return Container(
+                                                        color: Colors.red,
+                                                        height: 20,
+                                                        width: 20);
+                                                  }, */
+
+                                                  /*  blue.device == null
+                                          ? print('no device')
+                                          :  */ /* 
+                                          snapshot.data == null ?
+                                          print('no device')
+                                                   */
+
+                                                  switch (snapshot.data) {
+                                                    case BluetoothDeviceState
+                                                        .connected:
+                                                      {
+                                                        return Container(
+                                                            color: Colors.green,
+                                                            height: 20,
+                                                            width: 20);
+                                                      }
+                                                      break;
+                                                    case BluetoothDeviceState
+                                                        .connecting:
+                                                      {
+                                                        return Container(
+                                                            color: Colors.amber,
+                                                            height: 20,
+                                                            width: 20);
+                                                      }
+                                                      break;
+                                                    case BluetoothDeviceState
+                                                        .disconnected:
+                                                      {
+                                                        return Container(
+                                                            color: Colors.red,
+                                                            height: 20,
+                                                            width: 20);
+                                                      }
+                                                      break;
+                                                    case BluetoothDeviceState
+                                                        .disconnecting:
+                                                      {
+                                                        return Container(
+                                                            color: Colors.red,
+                                                            height: 20,
+                                                            width: 20);
+                                                      }
+                                                      break;
+                                                  }
+                                                },
+                                              ),
                                             ),
-                                            TextButton(
-                                              child: Text('Disconnect'),
-                                              onPressed: () {
-                                                blue.empty();
-                                                print(
-                                                    blue.device.id.toString());
-                                                print(blue.status.toString());
-                                              },
-                                            ),
-                                            TextButton(
-                                              child: Text('Dismiss'),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: Text('Scan and Connect'),
+                                                onPressed: () {
+                                                  if (blue.device == null) {
+                                                    blue.connectDevice();
+                                                  } else {
+                                                    throw Exception(
+                                                        'already connected!');
+                                                  }
+                                                  /* 
+                                                  print(
+                                                      blue.connected.toString());
+                                                  print(blue.device.toString()); */
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: Text('Disconnect'),
+                                                onPressed: () {
+                                                  blue.empty();
+                                                  print(blue.device.id
+                                                      .toString());
+                                                  print(blue.status.toString());
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: Text('Dismiss'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
-                          )
-                        : Container(
-                            child: Text('No Location!'),
-                          ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        LeftFootMap(),
-                        RightFootMap(),
-                      ],
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      //color: Colors.lime,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF3F5F7),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 6.0,
-                            color: Colors.black26,
-                            offset: Offset(0, 2),
-                          ),
+                              ],
+                            )
+                          : Container(
+                              child: Text('No Location!'),
+                            ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          LeftFootMap(),
+                          RightFootMap(streamController.stream),
                         ],
                       ),
-                      child: TextFormField(
-                        controller: notesController,
-                        decoration: const InputDecoration(
-                          labelText: 'Notes about your activity ...',
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        //color: Colors.lime,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF3F5F7),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 6.0,
+                              color: Colors.black26,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Enter some notes';
-                          }
-                          return null;
-                        },
-                        onSaved: (newValue) {
-                          _newActivity.endTime = DateTime.now();
-                          _newActivity.duration = _newActivity.endTime
-                              .difference(_newActivity.startTime);
-                          _newActivity.notes = newValue;
-                          if (_position != null) {
-                            _newActivity.position = _position;
-                          } else {
-                            _newActivity.position = Position(
-                                latitude: -32.01088385372162,
-                                longitude: 115.81459351402168);
-                          }
-                        },
+                        child: TextFormField(
+                          controller: notesController,
+                          decoration: const InputDecoration(
+                            labelText: 'Notes about your activity ...',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Enter some notes';
+                            }
+                            return null;
+                          },
+                          onSaved: (newValue) {
+                            _newActivity.endTime = DateTime.now();
+                            _newActivity.duration = _newActivity.endTime
+                                .difference(_newActivity.startTime);
+                            _newActivity.notes = newValue;
+                            if (_position != null) {
+                              _newActivity.position = _position;
+                            } else {
+                              _newActivity.position = Position(
+                                  latitude: -32.01088385372162,
+                                  longitude: 115.81459351402168);
+                            }
+                          },
+                        ),
                       ),
-                    ),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                    Container(
-                      child: Column(
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.05),
+                      Container(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Pain Rating',
+                              style: TextStyle(fontSize: 16),
+                              textAlign: TextAlign.start,
+                            ),
+                            Slider(
+                                value: _painRating,
+                                max: 10,
+                                min: 0,
+                                label: _painRating.toString(),
+                                onChanged: (double value) {
+                                  setState(() {
+                                    _newActivity.data['painRating'] = value;
+                                    _painRating = value;
+                                  });
+                                }),
+                          ],
+                        ),
+                      ),
+                      Container(
+                          child: Column(
                         children: [
                           Text(
-                            'Pain Rating',
+                            'Confidence during activity',
                             style: TextStyle(fontSize: 16),
                             textAlign: TextAlign.start,
                           ),
                           Slider(
-                              value: _painRating,
+                              value: _confidenceRating,
                               max: 10,
                               min: 0,
-                              label: _painRating.toString(),
+                              label: _confidenceRating.toString(),
                               onChanged: (double value) {
                                 setState(() {
-                                  _newActivity.data['painRating'] = value;
-                                  _painRating = value;
+                                  _newActivity.data['confidenceRating'] = value;
+                                  _confidenceRating = value;
                                 });
-                              }),
+                              })
                         ],
-                      ),
-                    ),
-                    Container(
-                        child: Column(
-                      children: [
-                        Text(
-                          'Confidence during activity',
-                          style: TextStyle(fontSize: 16),
-                          textAlign: TextAlign.start,
-                        ),
-                        Slider(
-                            value: _confidenceRating,
-                            max: 10,
-                            min: 0,
-                            label: _confidenceRating.toString(),
-                            onChanged: (double value) {
-                              setState(() {
-                                _newActivity.data['confidenceRating'] = value;
-                                _confidenceRating = value;
-                              });
-                            })
-                      ],
-                    )),
-                    Container(
-                      child: Text(
-                        swatch.totalDuration,
-                        style: TextStyle(
-                          fontSize: 50.0,
+                      )),
+                      Container(
+                        child: Text(
+                          swatch.totalDuration,
+                          style: TextStyle(
+                            fontSize: 50.0,
+                          ),
                         ),
                       ),
-                    ),
-                    (!submittable || recording)
-                        ? Container(
-                            margin: EdgeInsets.only(top: 10),
-                            height: MediaQuery.of(context).size.height * 0.1,
-                            width: MediaQuery.of(context).size.height * 0.1,
-                            child: RaisedButton(
-                              color: recording
-                                  ? Colors.redAccent
-                                  : Theme.of(context).primaryColor,
-                              elevation: 10.0,
-                              child: Container(
-                                //color: Colors.blue,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.06,
-                                width:
-                                    MediaQuery.of(context).size.height * 0.06,
-                                child: Column(
-                                  children: [
-                                    recording
-                                        ? Icon(Icons.stop)
-                                        : Icon(Icons.play_arrow),
-                                    recording ? Text('Stop') : Text('Start'),
-                                  ],
-                                ),
-                              ),
-                              shape: CircleBorder(
-                                side: BorderSide(
-                                    //color: Theme.of(context).primaryColor,
+                      (!submittable || recording)
+                          ? Container(
+                              margin: EdgeInsets.only(top: 10),
+                              height: MediaQuery.of(context).size.height * 0.1,
+                              width: MediaQuery.of(context).size.height * 0.1,
+                              child: blue.device == null
+                                  ? Text('No Device Connected!')
+                                  : RaisedButton(
+                                      color: recording
+                                          ? Colors.redAccent
+                                          : Theme.of(context).primaryColor,
+                                      elevation: 10.0,
+                                      child: StreamBuilder<
+                                              BluetoothDeviceState>(
+                                          stream: blue.deviceState,
+                                          initialData:
+                                              BluetoothDeviceState.disconnected,
+                                          builder: (context, snapshot) {
+                                            if (snapshot.data !=
+                                                BluetoothDeviceState
+                                                    .connected) {
+                                              return Text(
+                                                  'No Device Connected!');
+                                            } else {
+                                              return Container(
+                                                //color: Colors.blue,
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.06,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.06,
+                                                child: Column(
+                                                  children: [
+                                                    recording
+                                                        ? Icon(Icons.stop)
+                                                        : Icon(
+                                                            Icons.play_arrow),
+                                                    recording
+                                                        ? Text('Stop')
+                                                        : Text('Start'),
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                          }),
+                                      shape: CircleBorder(
+                                        side: BorderSide(
+                                            //color: Theme.of(context).primaryColor,
+                                            ),
+                                      ),
+                                      onPressed: () {
+                                        _recordChange();
+                                        switch (recording) {
+                                          case true:
+                                            {
+                                              swatch.start();
+                                              if (blue.device != null) {
+                                                streamSubscription =
+                                                    streamController.stream
+                                                        .listen((event) {
+                                                  sensorData.add(event);
+                                                });
+                                              }
+                                            }
+                                            break;
+                                          case false:
+                                            {
+                                              swatch.pause();
+                                              if (blue.device != null) {
+                                                streamSubscription.pause();
+                                              }
+                                            }
+                                        }
+                                        //recording ? swatch.start() : swatch.pause();
+                                        submittable = true;
+                                      },
                                     ),
-                              ),
-                              onPressed: () {
-                                _recordChange();
-                                recording ? swatch.start() : swatch.pause();
-                                submittable = true;
-                              },
+                            )
+                          : SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.05,
+                              width: 10,
                             ),
-                          )
-                        : SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.05,
-                            width: 10,
-                          ),
-                    (submittable && !recording)
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              RaisedButton(
-                                  child: Text('Reset'),
-                                  onPressed: () {
-                                    submittable = false;
-                                    _reset(swatch);
-                                  }),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.1,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.1,
-                              ),
-                              RaisedButton(
-                                child: Text('Submit'),
-                                onPressed: () => _submit(swatch),
-                              ),
-                            ],
-                          )
-                        : SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.1,
-                            width: 10,
-                          ),
-                  ],
+                      (submittable && !recording)
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RaisedButton(
+                                    child: Text('Reset'),
+                                    onPressed: () {
+                                      submittable = false;
+                                      _reset(swatch);
+                                    }),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                ),
+                                RaisedButton(
+                                  child: Text('Submit'),
+                                  onPressed: () => _submit(swatch, sensorData),
+                                ),
+                              ],
+                            )
+                          : SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.1,
+                              width: 10,
+                            ),
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
