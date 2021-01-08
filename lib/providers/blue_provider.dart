@@ -15,6 +15,10 @@ class BlueProvider with ChangeNotifier {
   bool isAvailable = false;
   bool scanning = false;
 
+  /* StreamController<List<int>> sensorStreamController =
+      StreamController<List<int>>(); */
+  Stream<List<int>> sensorStream;
+
   BTStatus _status = BTStatus.unavailable;
 
   BTStatus get status {
@@ -74,38 +78,54 @@ class BlueProvider with ChangeNotifier {
   Future<void> connectDevice() async {
     /* _status = BTStatus.scanning;
     notifyListeners(); */
-    try {
-      await fBlue.startScan(timeout: Duration(seconds: 5));
-
-      //add if already connected then just pass done change state to scanning
-
-      await fBlue.scanResults.listen(
-        (results) async {
-          print(results.toString());
-          ScanResult correctResult = results
-              .where((element) => element.device.id == deviceIdentifier)
-              .toList()[0];
-          device = correctResult.device;
-          if (device == null) {
-            print('preexcept');
-            //_status = BTStatus.off;
-            throw Exception(
-                'Device not found, make sure to turn on BT and the device.');
-          } else {
-            await device.connect();
-            print('else');
-            //_status = BTStatus.connected;
-            //notifyListeners();
-          }
+    bool connected =
+        await fBlue.connectedDevices.then((value) => value.length == 1);
+    //bool connected = (device != null) ? true : false;
+    //can write a little check func here that tests getting listen
+    if (connected) {
+      fBlue.connectedDevices.then(
+        (value) {
+          print('connected is true looking in .connected devices');
+          device = value[0];
+          //_status = BTStatus.connected;
+          //notifyListeners();
         },
       );
-    } catch (e) {
-      print(e);
-    } finally {
-      fBlue.stopScan();
-      print('INSIDE CONNECT DEVICE ${(device != null)}');
+    } else {
+      try {
+        print('doing scan no conn device.');
+        await fBlue.startScan(timeout: Duration(seconds: 5));
+
+        //add if already connected then just pass done change state to scanning
+
+        await fBlue.scanResults.listen(
+          (results) async {
+            print(results.toString());
+            ScanResult correctResult = results
+                .where((element) => element.device.id == deviceIdentifier)
+                .toList()[0];
+            device = correctResult.device;
+            if (device == null) {
+              print('preexcept');
+              //_status = BTStatus.off;
+              throw Exception(
+                  'Device not found, make sure to turn on BT and the device.');
+            } else {
+              await device.connect();
+              print('else');
+              //_status = BTStatus.connected;
+              //notifyListeners();
+            }
+          },
+        );
+      } catch (e) {
+        print(e);
+      } finally {
+        fBlue.stopScan();
+        print('1INSIDE CONNECT DEVICE ${(device != null)}');
+      }
     }
-    print('INSIDE CONNECT DEVICE ${(device != null)}');
+    print('2INSIDE CONNECT DEVICE ${(device == null)}');
   }
 
   void getCharacteristic() async {
@@ -119,23 +139,60 @@ class BlueProvider with ChangeNotifier {
     characteristic =
         service.characteristics.firstWhere((c) => c.properties.notify == true);
     //print(' CHAR PROPS ${characteristic.properties.toString()}');
+    sensorStream = characteristic.value
+        .map((event) => utf8.decode(event))
+        .map((event) => event
+            .substring(0, event.length - 1)
+            .split(',')
+            .map((e) => int.parse(e))
+            .toList())
+        .asBroadcastStream();
   }
 
-  Stream<List<int>> getSensorDataStream() {
-    return characteristic.value.map((event) => utf8.decode(event)).map(
+  void getSensorDataStream() {
+    sensorStream = characteristic.value.map((event) => utf8.decode(event)).map(
         (event) => event
             .substring(0, event.length - 1)
             .split(',')
             .map((e) => int.parse(e))
             .toList());
-    /*    .listen((event) {
+    /* .listen((event) {
       List<int> cleaned_event = event
           .substring(0, event.length - 1)
           .split(',')
           .map((e) => int.parse(e))
-          .toList(); */
+          .toList();  */
     //sensorData.add(cleaned_event);
     //print(cleaned_event.toString());
+  }
+/* 
+  Stream<List<int>> sensorDataStream() {
+    Stream<List<int>> getStream() {
+      return this.characteristic.value.map((event) => utf8.decode(event)).map(
+          (event) => event
+              .substring(0, event.length - 1)
+              .split(',')
+              .map((e) => int.parse(e))
+              .toList());
+      /* .listen((event) {
+        /* List<int> cleaned_event = event.substring(0, event.length - 1)
+          .split(',')
+          .map((e) => int.parse(e))
+          .toList();  */
+        return event;
+      }); */
+    }
+
+    controller = StreamController<List<int>>(
+      onListen: getStream,
+      onResume: getStream,
+    );
+
+    return controller.stream;
+  } */
+
+  void empty() {
+    sensorData = [];
   }
 
   /*  Future<Stream<List<int>>> getSensorDataStream() async {
@@ -156,14 +213,4 @@ class BlueProvider with ChangeNotifier {
     //print(cleaned_event.toString());
   } */
 
-  void empty() {
-    /* if (device != null) {
-      //device.disconnect();
-      //device = null;
-    } */
-    sensorData = [];
-    _status = BTStatus.off;
-
-    notifyListeners();
-  }
 }

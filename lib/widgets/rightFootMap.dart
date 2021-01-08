@@ -8,23 +8,23 @@ import 'package:provider/provider.dart';
 final rightArray = List.filled(25, 0);
 
 class RightFootMap extends StatefulWidget {
-  Stream<List<int>> sensors;
+  //Stream<List<int>> sensors;
 
-  RightFootMap(this.sensors);
-
+  //RightFootMap(this.sensors);
+  RightFootMap();
   @override
   _RightFootMapState createState() => _RightFootMapState();
 }
 
 class _RightFootMapState extends State<RightFootMap> {
-  /* var _sensors = Stream<List<int>>.periodic(
+  var sensors = Stream<List<int>>.periodic(
       Duration(seconds: 1),
       (x) => [
             (5 * sin(x - 7 * pi / 4)).toInt(),
             (5 * sin(x - 6 * pi / 4)).toInt(),
             (5 * sin(x - 5 * pi / 4)).toInt(),
             (5 * sin(x - pi)).toInt(),
-          ]).take(100); */
+          ]).take(100);
 
   //var _sensors = Stream<List<int>>
 
@@ -33,7 +33,7 @@ class _RightFootMapState extends State<RightFootMap> {
     //BlueProvider blue = Provider.of<BlueProvider>(context);
 
     return StreamBuilder<List<int>>(
-        stream: widget.sensors,
+        stream: sensors, //widget.sensors,
         builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
           List<Widget> children;
           if (snapshot.hasError) {

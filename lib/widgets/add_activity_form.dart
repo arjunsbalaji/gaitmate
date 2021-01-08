@@ -42,6 +42,11 @@ class _AddActivityFormState extends State<AddActivityForm> {
   );
 
   List<List<int>> sensorData = [];
+
+  StreamController<List<int>> streamController;
+  StreamSubscription<List<int>> streamSubscription;
+  //StreamSubscription<String> streamSubscription;
+
   bool recording = false;
   bool submittable = false;
   bool isLoading = false;
@@ -50,9 +55,6 @@ class _AddActivityFormState extends State<AddActivityForm> {
   String _currentAddress;
   double _painRating = 0;
   double _confidenceRating = 0;
-
-  final StreamController<List<int>> streamController = StreamController();
-  StreamSubscription streamSubscription;
 
   Future<void> _getPosition() async {
     var status = await Permission.location.status;
@@ -161,6 +163,19 @@ class _AddActivityFormState extends State<AddActivityForm> {
 
     if (blue.device == null) {
       blue.connectDevice();
+      print('ADD ACT PAGEd' + '${blue.device}');
+      blue.getCharacteristic();
+      print('ADD ACT PAGEcm' + '${blue.characteristic}');
+      if (blue.characteristic != null) {
+        blue.getSensorDataStream();
+        print(blue.sensorStream.toString());
+        //Stream<List<int>> stream = blue.getSensorDataStream();
+        //print(stream.toString());
+        //streamController =
+        streamSubscription = blue.sensorStream
+            .asBroadcastStream()
+            .listen((List<int> event) => print(event));
+      }
     }
     //if (device !){streamController.addStream(blue.getSensorDataStream());}
 
@@ -212,6 +227,9 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                               child: StreamBuilder<
                                                   BluetoothDeviceState>(
                                                 stream: blue.deviceState,
+                                                initialData:
+                                                    BluetoothDeviceState
+                                                        .disconnected,
                                                 builder: (context, snapshot) {
                                                   /* if (snapshot.data ==
                                                       BluetoothDeviceState
@@ -282,9 +300,46 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                                 onPressed: () {
                                                   if (blue.device == null) {
                                                     blue.connectDevice();
+                                                    blue.getCharacteristic();
+                                                    if (blue.characteristic ==
+                                                        null) {
+                                                      blue.getSensorDataStream();
+                                                      print(
+                                                          'SCAN AND CONNECT 1' +
+                                                              blue.sensorStream
+                                                                  .toString());
+                                                      //Stream<List<int>> stream = blue.getSensorDataStream();
+                                                      //print(stream.toString());
+                                                      //streamController =
+                                                      streamSubscription = blue
+                                                          .sensorStream
+                                                          .asBroadcastStream()
+                                                          .listen((List<int>
+                                                                  event) =>
+                                                              print(event));
+                                                    } else {
+                                                      throw Exception(
+                                                          'Bluetooth device is here, but no characteristic!');
+                                                    }
                                                   } else {
-                                                    throw Exception(
-                                                        'already connected!');
+                                                    if (blue.characteristic ==
+                                                        null) {
+                                                      blue.getCharacteristic();
+                                                      //blue.getSensorDataStream();
+                                                      print(blue.sensorStream
+                                                          .toString());
+                                                      //Stream<List<int>> stream = blue.getSensorDataStream();
+                                                      //print(stream.toString());
+                                                      //streamController =
+                                                      streamSubscription = blue
+                                                          .sensorStream
+                                                          .listen((List<int>
+                                                                  event) =>
+                                                              print(event));
+                                                    } else {
+                                                      throw Exception(
+                                                          'connected and char are g!');
+                                                    }
                                                   }
                                                   /* 
                                                   print(
@@ -323,7 +378,7 @@ class _AddActivityFormState extends State<AddActivityForm> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           LeftFootMap(),
-                          RightFootMap(streamController.stream),
+                          RightFootMap(), //streamController.stream),
                         ],
                       ),
                       Container(
@@ -472,27 +527,24 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                             //color: Theme.of(context).primaryColor,
                                             ),
                                       ),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         _recordChange();
                                         switch (recording) {
                                           case true:
                                             {
                                               swatch.start();
-                                              if (blue.device != null) {
-                                                streamSubscription =
-                                                    streamController.stream
-                                                        .listen((event) {
-                                                  sensorData.add(event);
-                                                });
-                                              }
+                                              blue.sensorStream.listen(
+                                                  (event) => print(event));
+                                              //streamSubscription.resume();
                                             }
                                             break;
                                           case false:
                                             {
                                               swatch.pause();
-                                              if (blue.device != null) {
-                                                streamSubscription.pause();
-                                              }
+                                              //streamSubscription.pause();
+                                              /* sensorData = await blue
+                                                  .sensorStream
+                                                  .toList(); */
                                             }
                                         }
                                         //recording ? swatch.start() : swatch.pause();
