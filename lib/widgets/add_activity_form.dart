@@ -298,6 +298,7 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                               TextButton(
                                                 child: Text('Scan and Connect'),
                                                 onPressed: () {
+                                                  //BluetoothDeviceState ds = await blue.deviceState;
                                                   if (blue.device == null) {
                                                     blue.connectDevice();
                                                     print(
@@ -500,8 +501,10 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                               streamSubscription = blue
                                                   .sensorStream
                                                   .asBroadcastStream()
-                                                  .listen((List<int> event) =>
-                                                      print(event.toString()));
+                                                  .listen((List<int> event) {
+                                                print(event.toString());
+                                                sensorData.add(event);
+                                              });
                                               //streamSubscription.resume();
                                             }
                                             break;

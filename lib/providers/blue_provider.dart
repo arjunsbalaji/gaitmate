@@ -135,7 +135,7 @@ class BlueProvider with ChangeNotifier {
     BluetoothService service =
         services.firstWhere((s) => s.uuid.toString() == _serviceUUID);
     //print('SERVICE ${service.toString()}');
-    //print(service.characteristics.toString());
+    //print(service.characteristics.toString());m
     characteristic =
         service.characteristics.firstWhere((c) => c.properties.notify == true);
     //print(' CHAR PROPS ${characteristic.properties.toString()}');
