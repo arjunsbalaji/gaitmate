@@ -128,7 +128,7 @@ class BlueProvider with ChangeNotifier {
     print('2INSIDE CONNECT DEVICE ${(device == null)}');
   }
 
-  void getCharacteristic() async {
+  Future<void> getCharacteristic() async {
     List<BluetoothService> services = await device.discoverServices();
     //print('SERVICES LENGTH ${services.length}');
     //print(services[2].toString());
@@ -139,6 +139,7 @@ class BlueProvider with ChangeNotifier {
     characteristic =
         service.characteristics.firstWhere((c) => c.properties.notify == true);
     //print(' CHAR PROPS ${characteristic.properties.toString()}');
+    await characteristic.setNotifyValue(true);
     sensorStream = characteristic.value
         .map((event) => utf8.decode(event))
         .map((event) => event
@@ -149,7 +150,8 @@ class BlueProvider with ChangeNotifier {
         .asBroadcastStream();
   }
 
-  void getSensorDataStream() {
+  void getSensorDataStream() async {
+    await characteristic.setNotifyValue(true);
     sensorStream = characteristic.value.map((event) => utf8.decode(event)).map(
         (event) => event
             .substring(0, event.length - 1)
@@ -191,8 +193,8 @@ class BlueProvider with ChangeNotifier {
     return controller.stream;
   } */
 
-  void empty() {
-    sensorData = [];
+  Future<void> cancelNotify() async {
+    await characteristic.setNotifyValue(false);
   }
 
   /*  Future<Stream<List<int>>> getSensorDataStream() async {

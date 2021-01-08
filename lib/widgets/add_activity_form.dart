@@ -172,9 +172,9 @@ class _AddActivityFormState extends State<AddActivityForm> {
         //Stream<List<int>> stream = blue.getSensorDataStream();
         //print(stream.toString());
         //streamController =
-        streamSubscription = blue.sensorStream
+        /* streamSubscription = blue.sensorStream
             .asBroadcastStream()
-            .listen((List<int> event) => print(event));
+            .listen((List<int> event) => print(event)); */
       }
     }
     //if (device !){streamController.addStream(blue.getSensorDataStream());}
@@ -300,57 +300,18 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                                 onPressed: () {
                                                   if (blue.device == null) {
                                                     blue.connectDevice();
-                                                    blue.getCharacteristic();
-                                                    if (blue.characteristic ==
-                                                        null) {
-                                                      blue.getSensorDataStream();
-                                                      print(
-                                                          'SCAN AND CONNECT 1' +
-                                                              blue.sensorStream
-                                                                  .toString());
-                                                      //Stream<List<int>> stream = blue.getSensorDataStream();
-                                                      //print(stream.toString());
-                                                      //streamController =
-                                                      streamSubscription = blue
-                                                          .sensorStream
-                                                          .asBroadcastStream()
-                                                          .listen((List<int>
-                                                                  event) =>
-                                                              print(event));
-                                                    } else {
-                                                      throw Exception(
-                                                          'Bluetooth device is here, but no characteristic!');
-                                                    }
+                                                    print(
+                                                        blue.status.toString());
                                                   } else {
-                                                    if (blue.characteristic ==
-                                                        null) {
-                                                      blue.getCharacteristic();
-                                                      //blue.getSensorDataStream();
-                                                      print(blue.sensorStream
-                                                          .toString());
-                                                      //Stream<List<int>> stream = blue.getSensorDataStream();
-                                                      //print(stream.toString());
-                                                      //streamController =
-                                                      streamSubscription = blue
-                                                          .sensorStream
-                                                          .listen((List<int>
-                                                                  event) =>
-                                                              print(event));
-                                                    } else {
-                                                      throw Exception(
-                                                          'connected and char are g!');
-                                                    }
+                                                    throw Exception(
+                                                        'connected to device already!');
                                                   }
-                                                  /* 
-                                                  print(
-                                                      blue.connected.toString());
-                                                  print(blue.device.toString()); */
                                                 },
                                               ),
                                               TextButton(
                                                 child: Text('Disconnect'),
                                                 onPressed: () {
-                                                  blue.empty();
+                                                  blue.device.disconnect();
                                                   print(blue.device.id
                                                       .toString());
                                                   print(blue.status.toString());
@@ -529,19 +490,27 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                       ),
                                       onPressed: () async {
                                         _recordChange();
+                                        if (blue.characteristic == null) {
+                                          await blue.getCharacteristic();
+                                        }
                                         switch (recording) {
                                           case true:
                                             {
                                               swatch.start();
-                                              blue.sensorStream.listen(
-                                                  (event) => print(event));
+                                              streamSubscription = blue
+                                                  .sensorStream
+                                                  .asBroadcastStream()
+                                                  .listen((List<int> event) =>
+                                                      print(event.toString()));
                                               //streamSubscription.resume();
                                             }
                                             break;
                                           case false:
                                             {
                                               swatch.pause();
-                                              //streamSubscription.pause();
+                                              await blue.cancelNotify();
+                                              await streamSubscription.cancel();
+
                                               /* sensorData = await blue
                                                   .sensorStream
                                                   .toList(); */
