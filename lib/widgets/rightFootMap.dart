@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:gaitmate/helpers/size_config.dart';
@@ -17,6 +19,9 @@ class RightFootMap extends StatefulWidget {
 }
 
 class _RightFootMapState extends State<RightFootMap> {
+  StreamController<List<int>> streamController;
+  StreamSubscription<List<int>> streamSubscription;
+
   var sensors = Stream<List<int>>.periodic(
       Duration(seconds: 1),
       (x) => [
@@ -30,10 +35,18 @@ class _RightFootMapState extends State<RightFootMap> {
 
   @override
   Widget build(BuildContext context) {
-    //BlueProvider blue = Provider.of<BlueProvider>(context);
+    Stream<List<int>> sensorStream =
+        Provider.of<BlueProvider>(context).sensorStream;
+
+    BlueProvider blue = Provider.of<BlueProvider>(context);
+
+    /* streamSubscription =
+        sensorStream.asBroadcastStream().listen((List<int> event) {
+      return event;
+    }); */
 
     return StreamBuilder<List<int>>(
-        stream: sensors, //widget.sensors,
+        stream: sensorStream, //widget.sensors,
         builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
           List<Widget> children;
           if (snapshot.hasError) {
@@ -91,7 +104,8 @@ class _RightFootMapState extends State<RightFootMap> {
                         25,
                         (int index) {
                           return Container(
-                            color: Colors.amber[100 * rightArray[index]],
+                            color: Colors.purple[
+                                100 * (rightArray[index] / 2000).ceil()],
                           );
                         },
                       ),

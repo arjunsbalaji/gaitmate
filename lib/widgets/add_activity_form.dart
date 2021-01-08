@@ -140,6 +140,11 @@ class _AddActivityFormState extends State<AddActivityForm> {
     }
   }
 
+/* 
+  Widget showForcePlot4p() {
+    return 
+  } */
+
   @override
   void dispose() {
     super.dispose();
@@ -177,6 +182,7 @@ class _AddActivityFormState extends State<AddActivityForm> {
             .listen((List<int> event) => print(event)); */
       }
     }
+
     //if (device !){streamController.addStream(blue.getSensorDataStream());}
 
     return Scaffold(
@@ -336,13 +342,50 @@ class _AddActivityFormState extends State<AddActivityForm> {
                           : Container(
                               child: Text('No Location!'),
                             ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          LeftFootMap(),
-                          RightFootMap(), //streamController.stream),
-                        ],
-                      ),
+                      StreamBuilder<BluetoothDeviceState>(
+                          stream: blue.deviceState,
+                          builder: (context, snapshot) {
+                            switch (snapshot.data) {
+                              case BluetoothDeviceState.connected:
+                                {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      LeftFootMap(),
+                                      RightFootMap(), //streamController.stream),
+                                    ],
+                                  );
+                                }
+                                break;
+                              case BluetoothDeviceState.connecting:
+                                {
+                                  return Container(
+                                      color: Colors.amber,
+                                      height: 20,
+                                      width: 20);
+                                }
+                                break;
+                              case BluetoothDeviceState.disconnected:
+                                {
+                                  return Container(
+                                      color: Colors.red, height: 20, width: 20);
+                                }
+                                break;
+                              case BluetoothDeviceState.disconnecting:
+                                {
+                                  return Container(
+                                      color: Colors.red, height: 20, width: 20);
+                                }
+                                break;
+                            }
+                            /* Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                LeftFootMap(),
+                                RightFootMap(), //streamController.stream),
+                              ],
+                            ); */
+                          }),
                       Container(
                         padding: EdgeInsets.all(10),
                         //color: Colors.lime,
@@ -512,7 +555,7 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                             {
                                               swatch.pause();
                                               await blue.cancelNotify();
-                                              await streamSubscription.cancel();
+                                              //await streamSubscription.cancel();
 
                                               /* sensorData = await blue
                                                   .sensorStream
