@@ -541,6 +541,8 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                           case true:
                                             {
                                               swatch.start();
+                                              await blue.characteristic
+                                                  .setNotifyValue(true);
                                               streamSubscription = blue
                                                   .sensorStream
                                                   .asBroadcastStream()
@@ -554,7 +556,9 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                           case false:
                                             {
                                               swatch.pause();
-                                              await blue.cancelNotify();
+                                              await blue.characteristic
+                                                  .setNotifyValue(false);
+                                              //await blue.cancelNotify();
                                               //await streamSubscription.cancel();
 
                                               /* sensorData = await blue

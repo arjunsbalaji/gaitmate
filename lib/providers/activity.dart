@@ -59,13 +59,20 @@ Activity createActivity(record) {
 
   record.forEach((key, value) => {attributes[key] = value});
 
+  //print(attributes['sensorData'].runtimeType);
+  List<dynamic> sd = attributes['sensorData'];
+
+  sd = sd.map((e) => (e as List).map((v) => v as int).toList()).toList();
+
+  //print(sd.runtimeType);
+
   Activity activity = new Activity(
     data: {
       'painRating': attributes['painRating'],
       'confidenceRating': attributes['confidenceRating']
     },
     notes: attributes['notes'],
-    sensorData: attributes['sensorData'],
+    sensorData: sd,
     type: attributes['type'],
     startTime: DateTime.parse(attributes['startTime']),
     endTime: DateTime.parse(attributes['endTime']),

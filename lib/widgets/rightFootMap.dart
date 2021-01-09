@@ -62,8 +62,8 @@ class _RightFootMapState extends State<RightFootMap> {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
                 children = <Widget>[
-                  Icon(Icons.info, color: Colors.blue),
-                  Text('Connect the sensors'),
+                  Icon(Icons.play_arrow_rounded, color: Colors.blue),
+                  Text('Begin recording'),
                 ];
                 break;
               case ConnectionState.waiting:

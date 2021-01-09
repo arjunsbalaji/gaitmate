@@ -151,7 +151,7 @@ class BlueProvider with ChangeNotifier {
   }
 
   void getSensorDataStream() async {
-    await characteristic.setNotifyValue(true);
+    //await characteristic.setNotifyValue(true);
     sensorStream = characteristic.value.map((event) => utf8.decode(event)).map(
         (event) => event
             .substring(0, event.length - 1)
