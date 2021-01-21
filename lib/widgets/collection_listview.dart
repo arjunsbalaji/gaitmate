@@ -96,7 +96,7 @@ class _CollectionListViewState extends State<CollectionListView> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "${DateFormat.yMMMd('en_US').format(activities[index].startTime)} #${index + 1}",
+                                        "${DateFormat.yMMMd('en_US').format(activities[index].startTime)} #${index}",
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                             letterSpacing: 1.2,

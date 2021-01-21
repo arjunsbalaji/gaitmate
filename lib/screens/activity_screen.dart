@@ -6,7 +6,7 @@ import 'package:gaitmate/Services/database.dart';
 import '../providers/activity.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:gaitmate/widgets/columnChartWidget.dart';
-
+import 'package:gaitmate/widgets/sensor_data_chart.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ActivityScreen extends StatelessWidget {
@@ -48,7 +48,7 @@ class ActivityScreen extends StatelessWidget {
                     icon: Icon(Icons.delete),
                     onPressed: () {
                       removeActivity(activity.id);
-                      Navigator.pop(context,'deleted');
+                      Navigator.pop(context, 'deleted');
                     },
                   )
                 ],
@@ -71,13 +71,15 @@ class ActivityScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   child: GoogleMap(
                     mapType: MapType.hybrid,
-                    initialCameraPosition: _getCameraPosition(activity.position),
+                    initialCameraPosition:
+                        _getCameraPosition(activity.position),
                     onMapCreated: (GoogleMapController gMapsController) {
                       _gMapsController.complete(gMapsController);
                     },
                   ),
                 ),
               ),
+              SensorDataChart(activity.sensorData),
               Container(
                 child: Text(
                   "Activity Time: ${activity.duration.inMinutes} mins ${activity.duration.inSeconds} secs",
@@ -118,7 +120,9 @@ class ActivityScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.3, child: ColumnChart()),
+              SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  child: ColumnChart()),
             ],
           ),
         ),
