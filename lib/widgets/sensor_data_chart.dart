@@ -9,17 +9,18 @@ class SensorDataChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /* 
     final s0 = sensorData.map((e) => e[0]).toList();
     final s1 = sensorData.map((e) => e[1]).toList();
     final s2 = sensorData.map((e) => e[2]).toList();
-    final s3 = sensorData.map((e) => e[3]).toList();
-/* 
+    final s3 = sensorData.map((e) => e[3]).toList(); */
+    SensorDataForPlot ssd = SensorDataForPlot(sensorData);
+    /* 
     s0.asMap().forEach((key, value) => [key, value]) as List;
     s1.asMap().forEach((key, value) => [key, value]) as List;
     s2.asMap().forEach((key, value) => [key, value]);
     s3.asMap().forEach((key, value) => [key, value]); */
-    print('PPP' +
-        (s0.asMap().forEach((key, value) => [key, value]) as List).toString());
+    print('PPP' + sensorData.toString());
     return Container(
       height: SizeConfig.screenHeight * 0.4,
       width: SizeConfig.screenWidth * 0.9,
@@ -38,35 +39,26 @@ class SensorDataChart extends StatelessWidget {
           isVisible: true,
           position: LegendPosition.bottom,
         ),
-        series: <CartesianSeries>[
+        series: <LineSeries<List<int>, int>>[
           LineSeries<List<int>, int>(
             enableTooltip: true,
-            dataSource: s0.asMap().forEach((key, value) => [key, value])
-                as List<List<int>>,
-            xValueMapper: (List<int> s, _) => s[1],
-            yValueMapper: (List<int> s, _) => s[0],
-          ),
-          LineSeries<List<int>, int>(
-            dataSource: s1.asMap().forEach((key, value) => [key, value])
-                as List<List<int>>,
-            xValueMapper: (List<int> s, _) => s[1],
-            yValueMapper: (List<int> s, _) => s[0],
-          ),
-          LineSeries<List<int>, int>(
-            dataSource: s2.asMap().forEach((key, value) => [key, value])
-                as List<List<int>>,
-            xValueMapper: (List<int> s, _) => s[1],
-            yValueMapper: (List<int> s, _) => s[0],
-          ),
-          LineSeries<List<int>, int>(
-            dataSource: s3.asMap().forEach((key, value) => [key, value])
-                as List<List<int>>,
-            xValueMapper: (List<int> s, _) => s[1],
-            yValueMapper: (List<int> s, _) => s[0],
+            dataSource: ssd.getEnumerateSingleList(0),
+            xValueMapper: (List<int> s, _) => s[0],
+            yValueMapper: (List<int> s, _) => s[1],
           ),
         ],
         title: ChartTitle(text: 'Right Foot'),
       ),
     );
+  }
+}
+
+class SensorDataForPlot {
+  List<List<int>> sd;
+  SensorDataForPlot(this.sd);
+
+  List<List<int>> getEnumerateSingleList(int index) {
+    List<int> s = sd.map((e) => e[index]).toList();
+    return s.asMap().forEach((key, value) => [key, value]) as List<List<int>>;
   }
 }

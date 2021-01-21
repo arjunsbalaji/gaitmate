@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:gaitmate/Services/database.dart';
 import 'package:gaitmate/providers/blue_provider.dart';
+import 'package:gaitmate/screens/add_activity_screen.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -174,16 +175,8 @@ class _AddActivityFormState extends State<AddActivityForm> {
       if (blue.characteristic != null) {
         blue.getSensorDataStream();
         print(blue.sensorStream.toString());
-        //Stream<List<int>> stream = blue.getSensorDataStream();
-        //print(stream.toString());
-        //streamController =
-        /* streamSubscription = blue.sensorStream
-            .asBroadcastStream()
-            .listen((List<int> event) => print(event)); */
       }
     }
-
-    //if (device !){streamController.addStream(blue.getSensorDataStream());}
 
     return Scaffold(
       appBar: AppBar(
@@ -241,41 +234,42 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                                     case BluetoothDeviceState
                                                         .connected:
                                                       {
-                                                        return Container(
-                                                            color: Colors.green,
-                                                            height: 20,
-                                                            width: 20);
+                                                        return ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          child: Container(
+                                                              color:
+                                                                  Colors.green,
+                                                              height: 20,
+                                                              width: 20),
+                                                        );
                                                       }
                                                     case BluetoothDeviceState
                                                         .connecting:
                                                       {
-                                                        return Container(
-                                                            color: Colors.amber,
-                                                            height: 20,
-                                                            width: 20);
-                                                      }
-                                                    case BluetoothDeviceState
-                                                        .disconnected:
-                                                      {
-                                                        return Container(
-                                                            color: Colors.red,
-                                                            height: 20,
-                                                            width: 20);
-                                                      }
-                                                    case BluetoothDeviceState
-                                                        .disconnecting:
-                                                      {
-                                                        return Container(
-                                                            color: Colors.red,
-                                                            height: 20,
-                                                            width: 20);
+                                                        return ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          child: Container(
+                                                              color:
+                                                                  Colors.amber,
+                                                              height: 20,
+                                                              width: 20),
+                                                        );
                                                       }
                                                     default:
                                                       {
-                                                        return Container(
-                                                            color: Colors.red,
-                                                            height: 20,
-                                                            width: 20);
+                                                        return ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          child: Container(
+                                                              color: Colors.red,
+                                                              height: 20,
+                                                              width: 20),
+                                                        );
                                                       }
                                                   }
                                                 },
@@ -284,10 +278,33 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                             actions: <Widget>[
                                               TextButton(
                                                 child: Text('Scan and Connect'),
-                                                onPressed: () {
+                                                onPressed: () async {
                                                   //BluetoothDeviceState ds = await blue.deviceState;
-                                                  if (blue.device == null) {
+                                                  List<BluetoothDevice> cD =
+                                                      await blue.fBlue
+                                                          .connectedDevices;
+
+                                                  if (cD.length == 0) {
                                                     blue.connectDevice();
+                                                    print('ADD ACT PAGEd' +
+                                                        '${blue.device}');
+                                                    blue.getCharacteristic();
+                                                    print('ADD ACT PAGEcm' +
+                                                        '${blue.characteristic}');
+                                                    if (blue.characteristic !=
+                                                        null) {
+                                                      blue.getSensorDataStream();
+                                                    }
+                                                    /*  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            AddActivityScreen(
+                                                          widget.user,
+                                                        ),
+                                                      ),
+                                                    ); */
+
                                                     print(
                                                         blue.status.toString());
                                                   } else {
@@ -337,27 +354,17 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                     ],
                                   );
                                 }
-                              case BluetoothDeviceState.connecting:
-                                {
-                                  return Container(
-                                      color: Colors.amber,
-                                      height: 20,
-                                      width: 20);
-                                }
-                              case BluetoothDeviceState.disconnected:
-                                {
-                                  return Container(
-                                      color: Colors.red, height: 20, width: 20);
-                                }
-                              case BluetoothDeviceState.disconnecting:
-                                {
-                                  return Container(
-                                      color: Colors.red, height: 20, width: 20);
-                                }
                               default:
                                 {
                                   return Container(
-                                      color: Colors.red, height: 20, width: 20);
+                                    child: Icon(
+                                      Icons.bluetooth_disabled_rounded,
+                                      size: 70,
+                                    ),
+                                    color: Colors.red,
+                                    height: 90,
+                                    width: 90,
+                                  );
                                 }
                             }
                             /* Row(
@@ -467,7 +474,10 @@ class _AddActivityFormState extends State<AddActivityForm> {
                               height: MediaQuery.of(context).size.height * 0.1,
                               width: MediaQuery.of(context).size.height * 0.1,
                               child: blue.device == null
-                                  ? Text('No Device Connected!')
+                                  ? Icon(
+                                      Icons.error_outline_rounded,
+                                      color: Colors.red,
+                                    )
                                   : RaisedButton(
                                       color: recording
                                           ? Colors.redAccent
@@ -481,7 +491,9 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                         builder: (context, snapshot) {
                                           if (snapshot.data !=
                                               BluetoothDeviceState.connected) {
-                                            return Text('No Device Connected!');
+                                            return Icon(
+                                              Icons.error_outline_rounded,
+                                            );
                                           } else {
                                             return Container(
                                               //color: Colors.blue,
