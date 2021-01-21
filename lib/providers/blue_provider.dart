@@ -98,13 +98,14 @@ class BlueProvider with ChangeNotifier {
 
         //add if already connected then just pass done change state to scanning
 
-        await fBlue.scanResults.listen(
+        fBlue.scanResults.listen(
           (results) async {
             print(results.toString());
             ScanResult correctResult = results
                 .where((element) => element.device.id == deviceIdentifier)
                 .toList()[0];
             device = correctResult.device;
+            print('std connect');
             if (device == null) {
               print('preexcept');
               //_status = BTStatus.off;

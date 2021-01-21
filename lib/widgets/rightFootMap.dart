@@ -46,99 +46,108 @@ class _RightFootMapState extends State<RightFootMap> {
     }); */
 
     return StreamBuilder<List<int>>(
-        stream: sensorStream, //widget.sensors,
-        builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
-          List<Widget> children;
-          if (snapshot.hasError) {
-            children = <Widget>[
-              Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
-              ),
-              Text('Error: ${snapshot.error}'),
-            ];
-          } else {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
+      stream: sensorStream, //widget.sensors,
+      builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
+        List<Widget> children;
+        if (snapshot.hasError) {
+          children = <Widget>[
+            Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            ),
+            Text('Error: ${snapshot.error}'),
+          ];
+        } else {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              children = <Widget>[
+                Icon(Icons.play_arrow_rounded, color: Colors.blue),
+                Text('Begin recording'),
+              ];
+              break;
+            case ConnectionState.waiting:
+              children = <Widget>[
+                Center(
+                  child: Container(
+                    padding:
+                        EdgeInsets.all(SizeConfig.blockSizeHorizontal * 10),
+                    width: SizeConfig.blockSizeVertical * 20,
+                    height: SizeConfig.blockSizeVertical * 20,
+                    child: const CircularProgressIndicator(),
+                  ),
+                )
+              ];
+              break;
+            case ConnectionState.active:
+              rightArray[2] = snapshot.data[0];
+              rightArray[6] = snapshot.data[1];
+              rightArray[9] = snapshot.data[2];
+              rightArray[23] = snapshot.data[3];
+              rightArray[7] = ((rightArray[2] + rightArray[6]) ~/ 2);
+              rightArray[8] = ((rightArray[7] + rightArray[9]) ~/ 2);
+              rightArray[13] =
+                  rightArray[8] + ((rightArray[23] - rightArray[8]) ~/ 3);
+              rightArray[18] =
+                  rightArray[13] + ((rightArray[23] - rightArray[8]) ~/ 3);
+              rightArray[12] = ((rightArray[7] + rightArray[13]) ~/ 2);
+
+              children = <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: SizeConfig.blockSizeHorizontal),
+                  width: SizeConfig.blockSizeHorizontal * 25,
+                  height: SizeConfig.blockSizeVertical * 20,
+                  child: GridView.count(
+                    crossAxisCount: 5,
+                    children: List.generate(
+                      25,
+                      (int index) {
+                        return Container(
+                          color: Colors
+                              .purple[100 * (rightArray[index] / 2000).ceil()],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ];
+              break;
+            case ConnectionState.done:
+              children = <Widget>[
+                Container(
+                  padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 5),
+                  width: SizeConfig.blockSizeHorizontal * 25,
+                  height: SizeConfig.blockSizeVertical * 20,
+                  child: Column(children: [
+                    Icon(
+                      Icons.info,
+                      color: Colors.blue,
+                    ),
+                    Text(
+                      'Sensor off',
+                      textAlign: TextAlign.center,
+                    )
+                  ]),
+                ),
+              ];
+              break;
+            default:
+              {
                 children = <Widget>[
                   Icon(Icons.play_arrow_rounded, color: Colors.blue),
                   Text('Begin recording'),
                 ];
                 break;
-              case ConnectionState.waiting:
-                children = <Widget>[
-                  Center(
-                    child: Container(
-                      padding:
-                          EdgeInsets.all(SizeConfig.blockSizeHorizontal * 10),
-                      width: SizeConfig.blockSizeVertical * 20,
-                      height: SizeConfig.blockSizeVertical * 20,
-                      child: const CircularProgressIndicator(),
-                    ),
-                  )
-                ];
-                break;
-              case ConnectionState.active:
-                rightArray[2] = snapshot.data[0];
-                rightArray[6] = snapshot.data[1];
-                rightArray[9] = snapshot.data[2];
-                rightArray[23] = snapshot.data[3];
-                rightArray[7] = ((rightArray[2] + rightArray[6]) ~/ 2);
-                rightArray[8] = ((rightArray[7] + rightArray[9]) ~/ 2);
-                rightArray[13] =
-                    rightArray[8] + ((rightArray[23] - rightArray[8]) ~/ 3);
-                rightArray[18] =
-                    rightArray[13] + ((rightArray[23] - rightArray[8]) ~/ 3);
-                rightArray[12] = ((rightArray[7] + rightArray[13]) ~/ 2);
-
-                children = <Widget>[
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: SizeConfig.blockSizeHorizontal),
-                    width: SizeConfig.blockSizeHorizontal * 25,
-                    height: SizeConfig.blockSizeVertical * 20,
-                    child: GridView.count(
-                      crossAxisCount: 5,
-                      children: List.generate(
-                        25,
-                        (int index) {
-                          return Container(
-                            color: Colors.purple[
-                                100 * (rightArray[index] / 2000).ceil()],
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ];
-                break;
-              case ConnectionState.done:
-                children = <Widget>[
-                  Container(
-                    padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 5),
-                    width: SizeConfig.blockSizeHorizontal * 25,
-                    height: SizeConfig.blockSizeVertical * 20,
-                    child: Column(children: [
-                      Icon(
-                        Icons.info,
-                        color: Colors.blue,
-                      ),
-                      Text(
-                        'Sensor off',
-                        textAlign: TextAlign.center,
-                      )
-                    ]),
-                  ),
-                ];
-                break;
-            }
+              }
           }
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: children,
-          );
-        });
+        }
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: children,
+        );
+      },
+    );
   }
 }
