@@ -13,12 +13,14 @@ Future<List<Activity>> getActivitiesByType(user, atype) async {
   DataSnapshot dataSnapshot =
       await databaseReference.child(user.uid).child('activities/').once();
   if (dataSnapshot.value != null) {
-    dataSnapshot.value.forEach((key, value) {
-      Activity activity = createActivity(value);
-      activity
-          .setID(databaseReference.child(user.uid).child('activities/' + key));
-      activities.add(activity);
-    });
+    dataSnapshot.value.forEach(
+      (key, value) {
+        Activity activity = createActivity(value);
+        activity.setID(
+            databaseReference.child(user.uid).child('activities/' + key));
+        activities.add(activity);
+      },
+    );
   }
   return activities;
 }
@@ -55,16 +57,18 @@ Future<Duration> getActivitiesWeek(user, atype) async {
   DataSnapshot dataSnapshot =
       await databaseReference.child(user.uid).child('activities/').once();
   if (dataSnapshot.value != null) {
-    dataSnapshot.value.forEach((key, value) {
-      Activity activity = createActivity(value);
-      activity
-          .setID(databaseReference.child(user.uid).child('activities/' + key));
-      if (activity.startTime
-          .isAfter(DateTime(now.year, now.month, now.day - 7))) {
-        activities.add(activity);
-        totalDuration += activity.duration;
-      }
-    });
+    dataSnapshot.value.forEach(
+      (key, value) {
+        Activity activity = createActivity(value);
+        activity.setID(
+            databaseReference.child(user.uid).child('activities/' + key));
+        if (activity.startTime
+            .isAfter(DateTime(now.year, now.month, now.day - 7))) {
+          activities.add(activity);
+          totalDuration += activity.duration;
+        }
+      },
+    );
   }
   return totalDuration;
 }

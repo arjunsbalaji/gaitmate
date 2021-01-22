@@ -65,7 +65,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Container(
                 //color: Colors.red,
                 padding: EdgeInsets.only(top: 10),
-                height: MediaQuery.of(context).size.height * 0.4,
+                height: MediaQuery.of(context).size.height * 0.3,
                 width: MediaQuery.of(context).size.width,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
