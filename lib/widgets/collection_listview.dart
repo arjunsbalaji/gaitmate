@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gaitmate/providers/collection.dart';
+import 'package:provider/provider.dart';
 import '../providers/activity.dart';
 import '../screens/activity_screen.dart';
 import 'package:gaitmate/Services/database.dart';
@@ -21,24 +23,28 @@ class _CollectionListViewState extends State<CollectionListView> {
 
   _CollectionListViewState(this.title, this.user);
 
-  List<Activity> activities = [];
-
-  void getActivities() {
+  // List<Activity> activities = [];
+/* 
+  void getActivities(List<Activity> activities) {
     final String type = title == 'Runs' ? 'run' : 'walk';
     getActivitiesByType(user, type).then((activities) => {
           this.setState(() {
-            this.activities = activities;
+            activities = activities;
           })
         });
   }
-
-  void initState() {
-    super.initState();
-    getActivities();
+ */
+  @override
+  void didChangeDependencies() {
+    //final activities =
+    //Provider.of<CollectionProvider>(context).initAndSetActivities(title);
+    //getActivities(activities);
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    final activities = Provider.of<CollectionProvider>(context).activities;
     return Column(
       children: [
         Padding(
@@ -112,8 +118,10 @@ class _CollectionListViewState extends State<CollectionListView> {
                                                 Colors.black,
                                                 Colors.transparent
                                               ],
-                                            ).createShader(Rect.fromLTRB(
-                                                0, 0, rect.width, rect.height));
+                                            ).createShader(
+                                              Rect.fromLTRB(0, 0, rect.width,
+                                                  rect.height),
+                                            );
                                           },
                                           blendMode: BlendMode.dstIn,
                                           child: Container(
@@ -161,7 +169,9 @@ class _CollectionListViewState extends State<CollectionListView> {
     );
   }
 
-  _navigatorAndReload(BuildContext context, index) async {
+  _navigatorAndReload(BuildContext context, int index) async {
+    final activities = Provider.of<CollectionProvider>(context).activities;
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -172,10 +182,5 @@ class _CollectionListViewState extends State<CollectionListView> {
         ),
       ),
     );
-    if (result == 'deleted') {
-      setState(() {
-        getActivities();
-      });
-    }
   }
 }

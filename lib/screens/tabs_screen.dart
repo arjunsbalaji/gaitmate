@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:gaitmate/providers/collection.dart';
 import 'package:gaitmate/screens/newdetailsScreen.dart';
+import 'package:provider/provider.dart';
 import './account_screen.dart';
 import './dashboard_screen.dart';
 import 'package:gaitmate/helpers/size_config.dart';
@@ -49,34 +51,39 @@ class _TabScreenState extends State<TabScreen> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return widget.needDetails < Duration(seconds: 10)
-        ? NewDetailsScreen(widget.user, new UserDetails())
-        : Scaffold(
-            body: SafeArea(
-              child: _pages[_selectedPage]['page'],
-            ),
-            bottomNavigationBar: BottomNavigationBar(
-              iconSize: 36.0,
-              currentIndex: _selectedPage,
-              selectedItemColor: Theme.of(context).primaryColor,
-              unselectedItemColor: Theme.of(context).accentColor,
-              selectedFontSize: 0,
-              onTap: _selectPage,
-              items: [
-                BottomNavigationBarItem(
-                  label: '',
-                  icon: Icon(
-                    Icons.dashboard,
-                  ),
+    return ChangeNotifierProvider(
+      create: (context) => CollectionProvider(widget.user),
+      builder: (context, child) {
+        return widget.needDetails < Duration(seconds: 10)
+            ? NewDetailsScreen(widget.user, new UserDetails())
+            : Scaffold(
+                body: SafeArea(
+                  child: _pages[_selectedPage]['page'],
                 ),
-                BottomNavigationBarItem(
-                  label: '',
-                  icon: CircleAvatar(
-                    radius: 15.0,
-                  ),
+                bottomNavigationBar: BottomNavigationBar(
+                  iconSize: 36.0,
+                  currentIndex: _selectedPage,
+                  selectedItemColor: Theme.of(context).primaryColor,
+                  unselectedItemColor: Theme.of(context).accentColor,
+                  selectedFontSize: 0,
+                  onTap: _selectPage,
+                  items: [
+                    BottomNavigationBarItem(
+                      label: '',
+                      icon: Icon(
+                        Icons.dashboard,
+                      ),
+                    ),
+                    BottomNavigationBarItem(
+                      label: '',
+                      icon: CircleAvatar(
+                        radius: 15.0,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
+              );
+      },
+    );
   }
 }

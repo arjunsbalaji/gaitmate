@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gaitmate/providers/activity.dart';
+import 'package:gaitmate/providers/collection.dart';
+import 'package:provider/provider.dart';
 import '../widgets/collection_listview.dart';
 
 class ActivitiesScreen extends StatefulWidget {
@@ -17,18 +19,19 @@ class ActivitiesScreen extends StatefulWidget {
 }
 
 class _ActivitiesScreenState extends State<ActivitiesScreen> {
-
   final String title;
   final User user;
 
   _ActivitiesScreenState(this.title, this.user);
 
   List<Activity> activities = [];
-  
+
   @override
   Widget build(BuildContext context) {
- 
-    return Scaffold(
+    //CollectionProvider cp =
+    return /* Provider<CollectionProvider>.value(value: null)
+      child:  */
+        Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.all(15.0),

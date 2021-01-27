@@ -14,7 +14,7 @@ class ActivityScreen extends StatelessWidget {
   final User user;
   final int index;
 
-  Completer<GoogleMapController> _gMapsController = Completer();
+  final Completer<GoogleMapController> _gMapsController = Completer();
   ActivityScreen(this.user, this.activity, this.index);
 
   CameraPosition _getCameraPosition(Position position) {

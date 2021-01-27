@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gaitmate/providers/activity.dart';
 import 'package:gaitmate/providers/blue_provider.dart';
+import 'package:gaitmate/providers/collection.dart';
 import 'package:gaitmate/screens/add_activity_screen.dart';
 import 'package:gaitmate/widgets/collections_preview.dart';
 import 'package:gaitmate/Services/database.dart';
@@ -19,13 +21,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String strTotalDuration;
 
   void getActivities() {
-    getActivitiesWeek(widget.user, 'all').then((totalDuration) => {
-          this.setState(() {
+    getActivitiesWeek(widget.user, 'all').then(
+      (totalDuration) => {
+        this.setState(
+          () {
             this.totalDuration = totalDuration;
             this.strTotalDuration =
                 totalDuration.toString().split('.').first.padLeft(8, '0');
-          })
-        });
+          },
+        )
+      },
+    );
   }
 
   void initState() {
@@ -35,6 +41,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    CollectionProvider collection = Provider.of<CollectionProvider>(context);
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Icon(
@@ -130,9 +138,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
     if (result == 'added') {
-      setState(() {
-        getActivities();
-      });
+      setState(
+        () {
+          getActivities();
+        },
+      );
     }
   }
 }
