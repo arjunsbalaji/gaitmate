@@ -200,103 +200,102 @@ class _AddActivityFormState extends State<AddActivityForm> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          _position != null
-                              ? Container(
-                                  //color: Colors.green,
+                      _position != null
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
                                   margin: EdgeInsets.only(
-                                      top: 10, left: 10, bottom: 10),
+                                      top: 30, left: 10, bottom: 10),
                                   child: Text(
                                     "You're in $_currentAddress today!",
                                     style: TextStyle(fontSize: 20),
                                   ),
-                                )
-                              : Container(
-                                  child: Text('No Location!'),
                                 ),
-                          Expanded(
-                            child: IconButton(
-                              tooltip: 'Bluetooth Settings!',
-                              icon: Icon(Icons.bluetooth),
-                              onPressed: () {
-                                showDialog<void>(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: Text('Bluetooth Status'),
-                                      content: Container(
-                                        child:
-                                            StreamBuilder<BluetoothDeviceState>(
-                                          stream: blue.deviceState,
-                                          initialData:
-                                              BluetoothDeviceState.disconnected,
-                                          builder: (context, snapshot) {
-                                            switch (snapshot.data) {
-                                              case BluetoothDeviceState
-                                                  .connected:
-                                                {
-                                                  return ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
-                                                    child: Container(
-                                                        color: Colors.green,
-                                                        height: 20,
-                                                        width: 20),
-                                                  );
-                                                }
-                                              case BluetoothDeviceState
-                                                  .connecting:
-                                                {
-                                                  return ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
-                                                    child: Container(
-                                                        color: Colors.amber,
-                                                        height: 20,
-                                                        width: 20),
-                                                  );
-                                                }
-                                              default:
-                                                {
-                                                  return ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
-                                                    child: Container(
-                                                        color: Colors.red,
-                                                        height: 20,
-                                                        width: 20),
-                                                  );
-                                                }
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: Text('Scan and Connect'),
-                                          onPressed: () async {
-                                            //BluetoothDeviceState ds = await blue.deviceState;
-                                            List<BluetoothDevice> cD =
-                                                await blue
-                                                    .fBlue.connectedDevices;
+                                Expanded(
+                                  child: IconButton(
+                                    icon: Icon(Icons.bluetooth),
+                                    onPressed: () {
+                                      showDialog<void>(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text('Bluetooth Status'),
+                                            content: Container(
+                                              child: StreamBuilder<
+                                                  BluetoothDeviceState>(
+                                                stream: blue.deviceState,
+                                                initialData:
+                                                    BluetoothDeviceState
+                                                        .disconnected,
+                                                builder: (context, snapshot) {
+                                                  switch (snapshot.data) {
+                                                    case BluetoothDeviceState
+                                                        .connected:
+                                                      {
+                                                        return ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          child: Container(
+                                                              color:
+                                                                  Colors.green,
+                                                              height: 20,
+                                                              width: 20),
+                                                        );
+                                                      }
+                                                    case BluetoothDeviceState
+                                                        .connecting:
+                                                      {
+                                                        return ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          child: Container(
+                                                              color:
+                                                                  Colors.amber,
+                                                              height: 20,
+                                                              width: 20),
+                                                        );
+                                                      }
+                                                    default:
+                                                      {
+                                                        return ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          child: Container(
+                                                              color: Colors.red,
+                                                              height: 20,
+                                                              width: 20),
+                                                        );
+                                                      }
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: Text('Scan and Connect'),
+                                                onPressed: () async {
+                                                  //BluetoothDeviceState ds = await blue.deviceState;
+                                                  List<BluetoothDevice> cD =
+                                                      await blue.fBlue
+                                                          .connectedDevices;
 
-                                            if (cD.length == 0) {
-                                              blue.connectDevice();
-                                              print('ADD ACT PAGEd' +
-                                                  '${blue.device}');
-                                              blue.getCharacteristic();
-                                              print('ADD ACT PAGEcm' +
-                                                  '${blue.characteristic}');
-                                              if (blue.characteristic != null) {
-                                                blue.getSensorDataStream();
-                                              }
-                                              /*  Navigator.push(
+                                                  if (cD.length == 0) {
+                                                    blue.connectDevice();
+                                                    print('ADD ACT PAGEd' +
+                                                        '${blue.device}');
+                                                    blue.getCharacteristic();
+                                                    print('ADD ACT PAGEcm' +
+                                                        '${blue.characteristic}');
+                                                    if (blue.characteristic !=
+                                                        null) {
+                                                      blue.getSensorDataStream();
+                                                    }
+                                                    /*  Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) =>
@@ -306,36 +305,41 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                                       ),
                                                     ); */
 
-                                              print(blue.status.toString());
-                                            } else {
-                                              throw Exception(
-                                                  'connected to device already!');
-                                            }
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: Text('Disconnect'),
-                                          onPressed: () {
-                                            blue.device.disconnect();
-                                            print(blue.device.id.toString());
-                                            print(blue.status.toString());
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: Text('Dismiss'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
+                                                    print(
+                                                        blue.status.toString());
+                                                  } else {
+                                                    throw Exception(
+                                                        'connected to device already!');
+                                                  }
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: Text('Disconnect'),
+                                                onPressed: () {
+                                                  blue.device.disconnect();
+                                                  print(blue.device.id
+                                                      .toString());
+                                                  print(blue.status.toString());
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: Text('Dismiss'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Container(
+                              child: Text('No Location!'),
                             ),
-                          ),
-                        ],
-                      ),
                       StreamBuilder<BluetoothDeviceState>(
                           stream: blue.deviceState,
                           builder: (context, snapshot) {
@@ -352,20 +356,14 @@ class _AddActivityFormState extends State<AddActivityForm> {
                                 }
                               default:
                                 {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Container(
-                                        child: Icon(
-                                          Icons.bluetooth_disabled_rounded,
-                                          size: 70,
-                                        ),
-                                        color: Colors.red,
-                                        height: 90,
-                                        width: 90,
-                                      ),
+                                  return Container(
+                                    child: Icon(
+                                      Icons.bluetooth_disabled_rounded,
+                                      size: 70,
                                     ),
+                                    color: Colors.red,
+                                    height: 90,
+                                    width: 90,
                                   );
                                 }
                             }
