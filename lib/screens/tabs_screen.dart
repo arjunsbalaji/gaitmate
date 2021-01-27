@@ -48,11 +48,14 @@ class _TabScreenState extends State<TabScreen> {
     });
   }
 
+  /*  return ChangeNotifierProvider(
+      create: (context) => CollectionProvider(widget.user),
+      builder: (context, child) { */
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return ChangeNotifierProvider(
-      create: (context) => CollectionProvider(widget.user),
+    return Provider<CollectionProvider>(
+      create: (_) => CollectionProvider(widget.user),
       builder: (context, child) {
         return widget.needDetails < Duration(seconds: 10)
             ? NewDetailsScreen(widget.user, new UserDetails())

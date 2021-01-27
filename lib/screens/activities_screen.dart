@@ -24,14 +24,12 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
 
   _ActivitiesScreenState(this.title, this.user);
 
-  List<Activity> activities = [];
+  //List<Activity> activities = [];
 
   @override
   Widget build(BuildContext context) {
     //CollectionProvider cp =
-    return /* Provider<CollectionProvider>.value(value: null)
-      child:  */
-        Scaffold(
+    return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.all(15.0),

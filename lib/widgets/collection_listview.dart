@@ -37,8 +37,13 @@ class _CollectionListViewState extends State<CollectionListView> {
   @override
   void didChangeDependencies() {
     //final activities =
-    //Provider.of<CollectionProvider>(context).initAndSetActivities(title);
-    //getActivities(activities);
+    //
+    print('initttttt');
+    Provider.of<CollectionProvider>(context)
+        .initAndSetActivities(title)
+        .then((_) => print('init and set'));
+    //List<Activity> activities =
+    //Provider.of<CollectionProvider>(context).activities;
     super.didChangeDependencies();
   }
 

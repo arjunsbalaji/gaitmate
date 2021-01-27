@@ -34,26 +34,33 @@ class CollectionProvider with ChangeNotifier {
   }
 
   Future<void> initAndSetActivities(String atype) async {
-    List<Activity> acts = [];
-    DataSnapshot dataSnapshot =
-        await databaseReference.child(user.uid).child('activities/').once();
-    if (dataSnapshot.value != null) {
-      dataSnapshot.value.forEach(
-        (key, value) {
-          Activity activity = createActivity(value);
-          activity.setID(
-              databaseReference.child(user.uid).child('activities/' + key));
-          acts.add(activity);
-        },
-      );
+    try {
+      List<Activity> acts = [];
+      DataSnapshot dataSnapshot =
+          await databaseReference.child(user.uid).child('activities/').once();
+      if (dataSnapshot.value != null) {
+        dataSnapshot.value.forEach(
+          (key, value) {
+            Activity activity = createActivity(value);
+            activity.setID(
+                databaseReference.child(user.uid).child('activities/' + key));
+            acts.add(activity);
+          },
+        );
+      }
+
+      _activities = acts;
+      notifyListeners();
+    } catch (error) {
+      throw (error);
     }
-    _activities = acts;
   }
 
   DatabaseReference saveActivity(Activity activity) {
     var id = databaseReference.child(user.uid).child('activities/').push();
     id.set(activity.toJson());
     _activities.add(activity);
+    notifyListeners();
     return id;
   }
 
@@ -62,6 +69,7 @@ class CollectionProvider with ChangeNotifier {
     _activities.removeWhere(
       (Activity activity) => activity.id == activityKey,
     );
+    notifyListeners();
   }
 
   Duration getActivitiesWeek(user, atype) {
