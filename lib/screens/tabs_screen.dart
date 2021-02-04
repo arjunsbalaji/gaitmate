@@ -54,39 +54,45 @@ class _TabScreenState extends State<TabScreen> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return Provider<CollectionProvider>(
-      create: (_) => CollectionProvider(widget.user),
-      builder: (context, child) {
-        return widget.needDetails < Duration(seconds: 10)
-            ? NewDetailsScreen(widget.user, new UserDetails())
-            : Scaffold(
-                body: SafeArea(
-                  child: _pages[_selectedPage]['page'],
-                ),
-                bottomNavigationBar: BottomNavigationBar(
-                  iconSize: 36.0,
-                  currentIndex: _selectedPage,
-                  selectedItemColor: Theme.of(context).primaryColor,
-                  unselectedItemColor: Theme.of(context).accentColor,
-                  selectedFontSize: 0,
-                  onTap: _selectPage,
-                  items: [
-                    BottomNavigationBarItem(
-                      label: '',
-                      icon: Icon(
-                        Icons.dashboard,
-                      ),
+
+    return MultiProvider(
+      providers: [
+        Provider<CollectionProvider>(
+          create: (_) => CollectionProvider(widget.user),
+        )
+      ],
+      child: widget.needDetails < Duration(seconds: 10)
+          ? NewDetailsScreen(
+              widget.user,
+              new UserDetails(),
+            )
+          : Scaffold(
+              body: SafeArea(
+                child: _pages[_selectedPage]['page'],
+              ),
+              bottomNavigationBar: BottomNavigationBar(
+                iconSize: 36.0,
+                currentIndex: _selectedPage,
+                selectedItemColor: Theme.of(context).primaryColor,
+                unselectedItemColor: Theme.of(context).accentColor,
+                selectedFontSize: 0,
+                onTap: _selectPage,
+                items: [
+                  BottomNavigationBarItem(
+                    label: '',
+                    icon: Icon(
+                      Icons.dashboard,
                     ),
-                    BottomNavigationBarItem(
-                      label: '',
-                      icon: CircleAvatar(
-                        radius: 15.0,
-                      ),
+                  ),
+                  BottomNavigationBarItem(
+                    label: '',
+                    icon: CircleAvatar(
+                      radius: 15.0,
                     ),
-                  ],
-                ),
-              );
-      },
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }

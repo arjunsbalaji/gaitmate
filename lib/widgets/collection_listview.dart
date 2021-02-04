@@ -20,6 +20,7 @@ class _CollectionListViewState extends State<CollectionListView> {
   final String title;
   final User user;
   final DateFormat formatter = DateFormat('dd-MM-yyyy');
+  bool loaded = false;
 
   _CollectionListViewState(this.title, this.user);
 
@@ -36,20 +37,21 @@ class _CollectionListViewState extends State<CollectionListView> {
  */
   @override
   void didChangeDependencies() {
-    //final activities =
-    //
+    //put new null safety here
     print('initttttt');
-    Provider.of<CollectionProvider>(context)
-        .initAndSetActivities(title)
-        .then((_) => print('init and set'));
-    //List<Activity> activities =
-    //Provider.of<CollectionProvider>(context).activities;
+    if (!loaded) {
+      Provider.of<CollectionProvider>(context).initAndSetActivities('runs');
+      loaded = true;
+    }
+
+    print('post if');
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    final activities = Provider.of<CollectionProvider>(context).activities;
+    final activities =
+        Provider.of<CollectionProvider>(context, listen: true).activities;
     return Column(
       children: [
         Padding(
@@ -174,16 +176,20 @@ class _CollectionListViewState extends State<CollectionListView> {
     );
   }
 
-  _navigatorAndReload(BuildContext context, int index) async {
-    final activities = Provider.of<CollectionProvider>(context).activities;
+  _navigatorAndReload(BuildContext context, int index) {
+    CollectionProvider collectionProvider =
+        Provider.of<CollectionProvider>(context, listen: false);
 
-    final result = await Navigator.push(
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ActivityScreen(
-          user,
-          activities[index],
-          index,
+        builder: (context) => ChangeNotifierProvider.value(
+          value: collectionProvider,
+          child: ActivityScreen(
+            collectionProvider.user,
+            collectionProvider.activities[index],
+            index,
+          ),
         ),
       ),
     );
