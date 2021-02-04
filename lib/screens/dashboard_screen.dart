@@ -41,7 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionProvider collection = Provider.of<CollectionProvider>(context);
+    //CollectionProvider collection = Provider.of<CollectionProvider>(context);
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -128,8 +128,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  _navigatorAndReload(BuildContext context) async {
-    final result = await Navigator.push(
+  _navigatorAndReload(BuildContext context) {
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddActivityScreen(
@@ -137,12 +137,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+    /* 
     if (result == 'added') {
       setState(
         () {
           getActivities();
         },
       );
-    }
+    } */
   }
 }

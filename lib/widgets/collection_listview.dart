@@ -38,13 +38,12 @@ class _CollectionListViewState extends State<CollectionListView> {
   @override
   void didChangeDependencies() {
     //put new null safety here
-    print('initttttt');
+    //print('initttttt');
     if (!loaded) {
       Provider.of<CollectionProvider>(context).initAndSetActivities('runs');
       loaded = true;
     }
-
-    print('post if');
+    //print('post if');
     super.didChangeDependencies();
   }
 
