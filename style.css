@@ -1,0 +1,83 @@
+body { 
+    font: 400 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; 
+    color: #111; 
+    background-color: #fdfdfd; 
+    -webkit-text-size-adjust: 100%; 
+    -webkit-font-feature-settings: "kern" 1; 
+    -moz-font-feature-settings: "kern" 1; 
+    -o-font-feature-settings: "kern" 1; 
+    font-feature-settings: "kern" 1; 
+    font-kerning: normal; 
+    margin: auto;
+    width: 50%;
+}
+  
+  h1 {
+    letter-spacing: -0.02em;
+    font-weight: normal;
+    font: 400 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; 
+    text-shadow: #999999 1px 1px 2px;
+    margin: 0;
+    font-size: 29px;
+    margin-bottom: 20px;
+  }
+
+  @media screen and (min-width: 400px) {
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+  }
+  @media screen and (min-width: 600px) {
+    h1 {
+      font-size: 59px;
+      margin-bottom: 40px;
+    }
+  }
+  @media screen and (min-width: 800px) {
+    h1 {
+      font-size: 74px;
+      margin-bottom: 30px;
+    }
+  }
+
+  .typeform-widget {
+    position: relative;
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  @media screen and (min-width: 400px) {
+    .typeform-widget {
+      margin-bottom: 10px;
+      height: 300px;
+    }
+  }
+  @media screen and (min-width: 600px) {
+    .typeform-widget {
+      margin-bottom: 30px;
+      height: 300px;
+    }
+  }
+  @media screen and (min-width: 800px) {
+    .typeform-widget {
+      margin-bottom: 30px;
+      height: 500px;
+    }
+  }
+  .typeform-default .typeform-widget {
+    margin-bottom: 30px;
+    height: 500px;
+  }
+  p {
+    font-family: Georgia,Serif;
+    font-size: 16px;
+    line-height: 150%;
+    color: #333;
+    text-align: justify;
+  }
+  
+  @media screen and (min-width: 800px) {
+    p {
+      font-size: 16px;
+    }
+  }
