@@ -25,8 +25,11 @@ class ActivityScreen extends StatelessWidget {
   }
 
   @override
+
   Widget build(BuildContext context) {
     //print(activity.position.toString());
+    final painRating = activity.data['painRating'] == null ? 0.0 : activity.data['painRating'];
+    final confidenceRating = activity.data['confidenceRating'] == null ? 0.0 : activity.data['confidenceRating'];
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -79,10 +82,9 @@ class ActivityScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SensorDataChart(activity.sensorData),
               Container(
                 child: Text(
-                  "Activity Time: ${activity.duration.inMinutes} mins ${activity.duration.inSeconds} secs",
+                  "Activity Time: ${activity.duration.inMinutes.remainder(60)} mins ${activity.duration.inSeconds.remainder(60)} secs",
                   style: TextStyle(fontSize: 20),
                   textAlign: TextAlign.left,
                 ),
@@ -104,7 +106,7 @@ class ActivityScreen extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 margin: EdgeInsets.only(top: 5),
                 child: Text(
-                  'Pain - ${(double.parse((activity.data['painRating']).toString())).toStringAsFixed(1)}/10',
+                  'Pain - ${(double.parse((painRating).toString())).toStringAsFixed(1)}/10',
                   style: TextStyle(
                     fontSize: 20,
                   ),
@@ -114,7 +116,7 @@ class ActivityScreen extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 margin: EdgeInsets.only(top: 5),
                 child: Text(
-                  'Confidence - ${(double.parse((activity.data['confidenceRating']).toString())).toStringAsFixed(1)}/10',
+                  'Confidence - ${(double.parse((confidenceRating).toString())).toStringAsFixed(1)}/10',
                   style: TextStyle(
                     fontSize: 20,
                   ),
@@ -122,7 +124,12 @@ class ActivityScreen extends StatelessWidget {
               ),
               SizedBox(
                   height: MediaQuery.of(context).size.height * 0.3,
-                  child: ColumnChart()),
+                  child: ColumnChart()
+              ),
+              SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  child:  SensorDataChart(activity.sensorData),
+              ),
             ],
           ),
         ),

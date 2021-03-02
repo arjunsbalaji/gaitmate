@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:gaitmate/helpers/size_config.dart';
 import 'package:gaitmate/providers/blue_provider.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 final rightArray = List.filled(25, 0);

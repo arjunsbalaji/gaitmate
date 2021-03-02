@@ -9,7 +9,7 @@ import 'package:gaitmate/screens/detailsScreen.dart';
 import 'package:gaitmate/helpers/size_config.dart';
 
 class AccountScreen extends StatefulWidget {
-  User user;
+  final User user;
   AccountScreen(this.user);
   @override
   _AccountScreenState createState() => _AccountScreenState();
@@ -39,7 +39,11 @@ class _AccountScreenState extends State<AccountScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Theme.of(context).primaryColor, Theme.of(context).accentColor,]
+                ),
               ),
               child: userDetails == null
               ? Center(child:CircularProgressIndicator())
@@ -51,7 +55,10 @@ class _AccountScreenState extends State<AccountScreen> {
                     onTap: (){},
                   ),
                   SizedBox(height: SizeConfig.blockSizeHorizontal*5),
-                  Text("Hello, ${userDetails?.displayName ?? 'nice to see you'}"),
+                  Text(
+                    "Hello, ${userDetails?.displayName ?? 'nice to see you'}",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40)
+                  ),
                   SizedBox(height: SizeConfig.blockSizeHorizontal*5),
                   Text('Weight: ${userDetails.weight} kg'),
                   SizedBox(height: SizeConfig.blockSizeHorizontal*5),

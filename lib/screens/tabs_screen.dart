@@ -1,8 +1,5 @@
-import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:gaitmate/providers/collection.dart';
 import 'package:gaitmate/screens/newdetailsScreen.dart';
 import 'package:provider/provider.dart';
