@@ -14,7 +14,7 @@ class TotalDurationText extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   stops: [0.3, 1],
-                  colors: [Color(0xff5f2c82), Color(0xff49a09d)])
+                  colors: [Color(0xff5f2c82), Color(0xff49a09d)]),
               ),
               child: Center(
                 child: Padding(

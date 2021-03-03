@@ -127,8 +127,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     builder: (BuildContext context) {
                       return Container(
                         height: MediaQuery.of(context).size.height*0.25,
-                        child: Card(
-                          child: card,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: Card(
+                              child: card,
+                          ),
                         )
                       );
                     }

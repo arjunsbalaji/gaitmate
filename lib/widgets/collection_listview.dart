@@ -95,7 +95,7 @@ class _CollectionListViewState extends State<CollectionListView> {
         ),
         Expanded(
           child: activities.isEmpty
-              ? Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator()) //implementation for provider null
               : Container(
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
