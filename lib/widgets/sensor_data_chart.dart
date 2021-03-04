@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gaitmate/helpers/size_config.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class SensorDataChart extends StatelessWidget {
@@ -9,56 +8,66 @@ class SensorDataChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /* 
-    final s0 = sensorData.map((e) => e[0]).toList();
-    final s1 = sensorData.map((e) => e[1]).toList();
-    final s2 = sensorData.map((e) => e[2]).toList();
-    final s3 = sensorData.map((e) => e[3]).toList(); */
-    SensorDataForPlot ssd = SensorDataForPlot(sensorData);
-    /* 
-    s0.asMap().forEach((key, value) => [key, value]) as List;
-    s1.asMap().forEach((key, value) => [key, value]) as List;
-    s2.asMap().forEach((key, value) => [key, value]);
-    s3.asMap().forEach((key, value) => [key, value]); */
-    print('PPP' + sensorData.toString());
-    return Container(
-      height: SizeConfig.screenHeight * 0.4,
-      width: SizeConfig.screenWidth * 0.9,
-      child: SfCartesianChart(
-        primaryXAxis: NumericAxis(
-          title: AxisTitle(
-            text: 'Time (s)',
-          ),
-        ),
-        primaryYAxis: NumericAxis(
-          title: AxisTitle(
-            text: 'Force (N)',
-          ),
-        ),
-        legend: Legend(
-          isVisible: true,
-          position: LegendPosition.bottom,
-        ),
-        series: <LineSeries<List<int>, int>>[
-          LineSeries<List<int>, int>(
-            enableTooltip: true,
-            dataSource: ssd.getEnumerateSingleList(0),
-            xValueMapper: (List<int> s, _) => s[0],
-            yValueMapper: (List<int> s, _) => s[1],
-          ),
-        ],
-        title: ChartTitle(text: 'Right Foot'),
-      ),
+
+    final l0 = sensorData.map((e) => e[0]).toList();
+    final l1 = sensorData.map((e) => e[1]).toList();
+    final l2 = sensorData.map((e) => e[2]).toList();
+    final l3 = sensorData.map((e) => e[3]).toList(); 
+
+    final s0 = l0.length == 0 ? 0.0: l0.reduce((a,b) => a + b)/l0.length;
+    final s1 = l1.length == 0 ? 0.0: l1.reduce((a,b) => a + b)/l1.length;
+    final s2 = l2.length == 0 ? 0.0: l2.reduce((a,b) => a + b)/l2.length;
+    final s3 = l3.length == 0 ? 0.0: l3.reduce((a,b) => a + b)/l3.length;
+
+    final List<ForceData> chartData = [
+      ForceData('Big Toe', s0, 40),
+      ForceData('Inner Foot', s1, 300),
+      ForceData('Outer Foot', s2, 100),
+      ForceData('Heel', s3, 60)
+    ];
+
+    return Scaffold(
+      body: Center(
+        child: Container(
+          child: SfCartesianChart(
+            primaryXAxis: CategoryAxis(),
+            primaryYAxis: NumericAxis(
+              title: AxisTitle(
+                text: 'Force (N)',
+              ),
+            ),
+
+            legend: Legend(
+              isVisible: true,
+              position: LegendPosition.bottom,
+              ),
+            series: <ChartSeries>[
+              ColumnSeries<ForceData, dynamic>(
+                name: 'Population Average',
+                dataSource: chartData,
+                xValueMapper: (ForceData value, _) => value.x,
+                yValueMapper: (ForceData value, _) => value.average
+              ),
+              ColumnSeries<ForceData, dynamic>(
+                name: 'Yours',
+                dataSource: chartData,
+                xValueMapper: (ForceData value, _) => value.x,
+                yValueMapper: (ForceData value, _) => value.client
+              )
+            ],
+            title: ChartTitle(
+              text: 'Right Foot'
+            ),
+          )
+        )
+      )
     );
   }
 }
 
-class SensorDataForPlot {
-  List<List<int>> sd;
-  SensorDataForPlot(this.sd);
-
-  List<List<int>> getEnumerateSingleList(int index) {
-    List<int> s = sd.map((e) => e[index]).toList();
-    return s.asMap().forEach((key, value) => [key, value]) as List<List<int>>;
+  class ForceData {
+    final String x;
+    final double client;
+    final double average;
+    ForceData(this.x, this.client, this.average);
   }
-}

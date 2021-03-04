@@ -21,6 +21,7 @@ class _CollectionListViewState extends State<CollectionListView> {
   final User user;
   final DateFormat formatter = DateFormat('dd-MM-yyyy');
   bool loaded = false;
+  bool sortEarlyLate = true;
 
   _CollectionListViewState(this.title, this.user);
 
@@ -51,6 +52,11 @@ class _CollectionListViewState extends State<CollectionListView> {
   Widget build(BuildContext context) {
     final activities =
         Provider.of<CollectionProvider>(context, listen: true).activities;
+    if (sortEarlyLate == true)
+      {activities.sort((a,b) => a.startTime.compareTo(b.startTime));}
+    else
+      {activities.sort((a,b) => b.startTime.compareTo(a.startTime));}
+
     return Column(
       children: [
         Padding(
@@ -69,12 +75,27 @@ class _CollectionListViewState extends State<CollectionListView> {
                   ),
                 ),
               ),
+              IconButton(
+                icon: Icon(Icons.sort),
+                onPressed: () {
+                  if (sortEarlyLate == true) {
+                    setState(() {
+                      sortEarlyLate = false;
+                    });
+                  }
+                  else {
+                    setState(() {
+                      sortEarlyLate = true;
+                    });
+                  }
+                },
+              ),
             ],
           ),
         ),
         Expanded(
           child: activities.isEmpty
-              ? Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator()) //implementation for provider null
               : Container(
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
@@ -155,7 +176,7 @@ class _CollectionListViewState extends State<CollectionListView> {
                                   child: Container(
                                     //color: Colors.green,
                                     child: Text(
-                                      "${activities[index].duration.inMinutes}m ${activities[index].duration.inSeconds}s",
+                                      "${activities[index].duration.inMinutes.remainder(60)}m ${activities[index].duration.inSeconds.remainder(60)}s",
                                       style: TextStyle(fontSize: 20),
                                       textAlign: TextAlign.center,
                                     ),

@@ -13,6 +13,8 @@ class Activity with ChangeNotifier {
   Duration duration;
   DateTime endTime;
   Position position;
+  int painRating;
+  int confidenceRating;
 
   Activity(
       {this.id,
@@ -23,7 +25,8 @@ class Activity with ChangeNotifier {
       this.startTime,
       this.duration,
       this.endTime,
-      this.position});
+      this.position,
+  });
 
   void setID(DatabaseReference id) {
     this.id = id;

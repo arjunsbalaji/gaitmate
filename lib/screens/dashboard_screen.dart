@@ -1,12 +1,14 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gaitmate/providers/activity.dart';
-import 'package:gaitmate/providers/blue_provider.dart';
 import 'package:gaitmate/providers/collection.dart';
 import 'package:gaitmate/screens/add_activity_screen.dart';
 import 'package:gaitmate/widgets/collections_preview.dart';
 import 'package:gaitmate/Services/database.dart';
-import 'package:provider/provider.dart';
+import 'package:gaitmate/widgets/painGraph.dart';
+import 'package:gaitmate/widgets/quote.dart';
+import 'package:gaitmate/widgets/totalDurationText.dart';
 
 class DashboardScreen extends StatefulWidget {
   final User user;
@@ -19,9 +21,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Duration totalDuration;
   final activitytypes = ['Runs', 'Walks'];
   String strTotalDuration;
+  List<int> pain;
 
-  void getActivities() {
-    getActivitiesWeek(widget.user, 'all').then(
+  void getActivitiesDuration() {
+    getActivitiesWeekDuration(widget.user, 'all').then(
       (totalDuration) => {
         this.setState(
           () {
@@ -34,15 +37,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  void getActivitiesPain() {
+    getActivitiesWeekPain(widget.user, 'all').then(
+      (pain) => {
+        this.setState(
+          () {
+            this.pain = pain;
+          },
+        )
+      },
+    );
+  }
+
   void initState() {
     super.initState();
-    getActivities();
+    getActivitiesPain();
+    getActivitiesDuration();
   }
 
   @override
   Widget build(BuildContext context) {
     //CollectionProvider collection = Provider.of<CollectionProvider>(context);
 
+    List cardList = [
+      Quote(),
+      PainChart(this.pain),
+      TotalDurationText(strTotalDuration),
+    ];
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Icon(
@@ -94,34 +115,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.03),
             Center(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'A journey of a thousand miles begins with a single step - Laozi',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontStyle: FontStyle.italic,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-              ),
-            ),
-            Center(
-              child: totalDuration == null
-                  ? CircularProgressIndicator()
-                  : Container(
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        'Total Duration of Activity for this week: $strTotalDuration',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                    ),
-            ),
+              child: pain == null
+              ? Column(children:[SizedBox(height:MediaQuery.of(context).size.height * 0.1),
+                                CircularProgressIndicator()])
+              : CarouselSlider(
+                items: cardList.map((card) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return Container(
+                        height: MediaQuery.of(context).size.height*0.25,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: Card(
+                              child: card,
+                          ),
+                        )
+                      );
+                    }
+                    );
+                }).toList(),
+                options: CarouselOptions(height: MediaQuery.of(context).size.height*0.25),
+
+              )
+            ), 
+
           ],
         ),
       ),
